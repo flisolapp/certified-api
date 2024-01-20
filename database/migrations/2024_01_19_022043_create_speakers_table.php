@@ -20,8 +20,9 @@ return new class extends Migration {
             $table->foreign('person_id')->references('id')->on('persons');
             $table->unsignedBigInteger('talk_id');
             $table->foreign('talk_id')->references('id')->on('talks');
-            $table->timestamps();
-            $table->timestamp('removed_at')->nullable();
+            $table->timestamp('created_at')->nullable()->comment('When this it\'s created');
+            $table->timestamp('updated_at')->nullable()->comment('When this it\'s updated');
+            $table->timestamp('removed_at')->nullable()->comment('When this it\'s removed');
             $table->index(['removed_at'], 'speakers_removed_at_index');
         });
     }

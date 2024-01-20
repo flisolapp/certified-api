@@ -27,7 +27,8 @@ class DatabaseSeeder extends Seeder
             TalkSubjectSeeder::class,
             TalkShiftSeeder::class,
             TalkKindSeeder::class,
-            // CountryStateAndCitySeeder::class,
+            // LocatesFromCountriesNowSeeder::class,
+            LocatesFromCountryStateCitySeeder::class,
             EditionSeeder::class,
         ]);
     }

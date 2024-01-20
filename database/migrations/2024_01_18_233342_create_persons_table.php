@@ -12,6 +12,8 @@ return new class extends Migration {
     {
         Schema::create('persons', function (Blueprint $table) {
             $table->id();
+            $table->unsignedBigInteger('responsible_id')->nullable();
+            $table->foreign('responsible_id')->references('id')->on('persons');
             $table->string('name', 80);
             $table->string('federal_code', 50);
             $table->string('email', 150);
@@ -35,10 +37,11 @@ return new class extends Migration {
             $table->foreign('distro_id')->references('id')->on('distros');
             $table->unsignedBigInteger('student_info_id')->nullable();
             $table->foreign('student_info_id')->references('id')->on('student_infos');
-            $table->string('student_place', 255);
-            $table->string('student_course', 255);
-            $table->timestamps();
-            $table->timestamp('removed_at')->nullable();
+            $table->string('student_place', 255)->nullable();
+            $table->string('student_course', 255)->nullable();
+            $table->timestamp('created_at')->nullable()->comment('When this it\'s created');
+            $table->timestamp('updated_at')->nullable()->comment('When this it\'s updated');
+            $table->timestamp('removed_at')->nullable()->comment('When this it\'s removed');
             $table->index(['name'], 'persons_name_index');
             $table->index(['federal_code'], 'persons_federal_code_index');
             $table->index(['email'], 'persons_email_index');

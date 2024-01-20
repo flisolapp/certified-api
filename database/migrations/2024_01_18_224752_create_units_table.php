@@ -4,35 +4,67 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
+/**
+ * Migration for creating and managing the 'units' table.
+ *
+ * This migration is responsible for setting up the 'units' table in the database.
+ * The table is designed to store information about various units, such as their names,
+ * acronyms, addresses, and operational details, along with their relationships to editions,
+ * cities, states, and countries. It includes methods for creating and dropping the table
+ * as part of the database migration process.
+ */
 return new class extends Migration {
+
     /**
-     * Run the migrations.
+     * Runs the migration to create the 'units' table.
+     *
+     * This method is executed when the migration is invoked. It sets up the
+     * structure of the 'units' table, specifying columns for storing detailed information about
+     * each unit, including location details and operational timings, and sets up indexes for efficient data retrieval.
      */
     public function up(): void
     {
         Schema::create('units', function (Blueprint $table) {
-            $table->id();
-            $table->unsignedBigInteger('edition_id');
+            // Description of the 'units' table's purpose.
+            $table->comment('Units');
+
+            // Creating a unique identifier for each unit record.
+            $table->id()->comment('Identification');
+
+            // Linking to the 'editions' table with a foreign key.
+            $table->unsignedBigInteger('edition_id')->comment('Identification of Edition');
             $table->foreign('edition_id')->references('id')->on('editions');
-            $table->string('name', 80);
-            $table->string('acronym', 30);
-            $table->string('address', 255)->nullable();
-            $table->string('address_neighborhood', 255)->nullable();
-            $table->unsignedBigInteger('address_city_id')->nullable();
+
+            // Adding columns for unit name, acronym, and address details.
+            $table->string('name', 80)->comment('Name');
+            $table->string('acronym', 30)->comment('Acronym');
+            $table->string('address', 255)->nullable()->comment('Address');
+            $table->string('address_neighborhood', 255)->nullable()->comment('Neighborhood of Address');
+            $table->unsignedBigInteger('address_city_id')->nullable()->comment('Identification of City of Address');
             $table->foreign('address_city_id')->references('id')->on('cities');
-            $table->string('address_city', 255)->nullable();
-            $table->unsignedBigInteger('address_state_id')->nullable();
+            $table->string('address_city', 255)->nullable()->comment('City of Address');
+            $table->unsignedBigInteger('address_state_id')->nullable()->comment('Identification of State of Address');
             $table->foreign('address_state_id')->references('id')->on('states');
-            $table->string('address_state', 255)->nullable();
-            $table->unsignedBigInteger('address_country_id')->nullable();
+            $table->string('address_state', 255)->nullable()->comment('State of Address');
+            $table->unsignedBigInteger('address_country_id')->nullable()->comment('Identification of Country of Address');
             $table->foreign('address_country_id')->references('id')->on('countries');
-            $table->string('address_country', 255)->nullable();
-            $table->date('when_at')->nullable();
-            $table->time('when_start_at')->nullable();
-            $table->time('when_end_at')->nullable();
-            $table->tinyInteger('active');
-            $table->timestamps();
-            $table->timestamp('removed_at')->nullable();
+            $table->string('address_country', 255)->nullable()->comment('Country of Address');
+            $table->decimal('address_lat', 15, 10)->nullable()->comment('Latitude of Address');
+            $table->decimal('address_lon', 15, 10)->nullable()->comment('Longitude of Address');
+            $table->point('address_location')->nullable()->comment('Location of Address (for Spatial Analysis Functions)');
+
+            // Columns for operational timings.
+            $table->date('when_at')->nullable()->comment('The day when it happens');
+            $table->time('when_start_at')->nullable()->comment('The time when it starts');
+            $table->time('when_end_at')->nullable()->comment('The time when it ends');
+            $table->tinyInteger('active')->comment('Active');
+
+            // Timestamps for tracking the creation, update, and removal of records.
+            $table->timestamp('created_at')->nullable()->comment('When created');
+            $table->timestamp('updated_at')->nullable()->comment('When updated');
+            $table->timestamp('removed_at')->nullable()->comment('When removed');
+
+            // Setting up indexes for efficient data retrieval.
             $table->index(['name'], 'units_name_index');
             $table->index(['acronym'], 'units_acronym_index');
             $table->index(['address'], 'units_address_index');
@@ -40,6 +72,9 @@ return new class extends Migration {
             $table->index(['address_city'], 'units_address_city_index');
             $table->index(['address_state'], 'units_address_state_index');
             $table->index(['address_country'], 'units_address_country_index');
+            $table->index(['address_lat'], 'units_address_lat_index');
+            $table->index(['address_lon'], 'units_address_lon_index');
+            $table->index(['address_location'], 'units_address_location_index');
             $table->index(['when_at'], 'units_when_at_index');
             $table->index(['when_start_at'], 'units_when_start_at_index');
             $table->index(['when_end_at'], 'units_when_end_at_index');
@@ -49,10 +84,14 @@ return new class extends Migration {
     }
 
     /**
-     * Reverse the migrations.
+     * Reverses the migration by removing the 'units' table.
+     *
+     * This method is executed during the rollback of the migration. It ensures the
+     * removal of the 'units' table from the database, undoing the initial setup.
      */
     public function down(): void
     {
         Schema::dropIfExists('units');
     }
+
 };

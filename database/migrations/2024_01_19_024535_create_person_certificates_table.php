@@ -30,8 +30,9 @@ return new class extends Migration {
             $table->string('federal_code', 50)->nullable();
             $table->string('code', 20)->nullable();
             $table->timestamp('last_view_at')->nullable();
-            $table->timestamps();
-            $table->timestamp('removed_at')->nullable();
+            $table->timestamp('created_at')->nullable()->comment('When this it\'s created');
+            $table->timestamp('updated_at')->nullable()->comment('When this it\'s updated');
+            $table->timestamp('removed_at')->nullable()->comment('When this it\'s removed');
             $table->index(['name'], 'person_certificates_name_index');
             $table->index(['federal_code'], 'person_certificates_federal_code_index');
             $table->index(['code'], 'person_certificates_code_index');

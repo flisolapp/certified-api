@@ -16,8 +16,9 @@ return new class extends Migration {
             $table->foreign('collaborator_id')->references('id')->on('collaborators');
             $table->unsignedBigInteger('collaboration_availability_id');
             $table->foreign('collaboration_availability_id', 'collaborators_availabilities_ca_id_foreign')->references('id')->on('collaboration_availabilities');
-            $table->timestamps();
-            $table->timestamp('removed_at')->nullable();
+            $table->timestamp('created_at')->nullable()->comment('When this it\'s created');
+            $table->timestamp('updated_at')->nullable()->comment('When this it\'s updated');
+            $table->timestamp('removed_at')->nullable()->comment('When this it\'s removed');
             $table->index(['removed_at'], 'collaborators_availabilities_removed_at_index');
         });
     }

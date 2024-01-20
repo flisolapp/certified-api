@@ -27,5 +27,51 @@ class CollaborationAreaSeeder extends Seeder
             ['id' => 12, 'value' => 'Graphic art and graphic material'],
             ['id' => 13, 'value' => 'Collaborative communication (real-time dissemination on social media)'],
         ]);
+        DB::table('collaboration_areas_i18n')->insertOrIgnore([
+            // English (USA)
+            ['id' => 1, 'collaboration_area_id' => 1, 'language' => 'en', 'value' => 'In search of sponsorship and support'],
+            ['id' => 2, 'collaboration_area_id' => 2, 'language' => 'en', 'value' => 'In advertising and dissemination (social networks)'],
+            ['id' => 3, 'collaboration_area_id' => 3, 'language' => 'en', 'value' => 'In organizing the blog'],
+            ['id' => 4, 'collaboration_area_id' => 4, 'language' => 'en', 'value' => 'In registration control (participants and speakers, certificates and control of activities)'],
+            ['id' => 5, 'collaboration_area_id' => 5, 'language' => 'en', 'value' => 'In the technological infrastructure (local network and wifi, servers and repositories)'],
+            ['id' => 6, 'collaboration_area_id' => 6, 'language' => 'en', 'value' => 'In the installation workshop (InstallFest) and recording images on media'],
+            ['id' => 7, 'collaboration_area_id' => 7, 'language' => 'en', 'value' => 'Theme (Other lectures, workshops and short courses)'],
+            ['id' => 8, 'collaboration_area_id' => 8, 'language' => 'en', 'value' => 'Registration system'],
+            ['id' => 9, 'collaboration_area_id' => 9, 'language' => 'en', 'value' => 'Rooms organization'],
+            ['id' => 10, 'collaboration_area_id' => 10, 'language' => 'en', 'value' => 'Visit and publicity in other schools or places'],
+            ['id' => 11, 'collaboration_area_id' => 11, 'language' => 'en', 'value' => 'Filming, photography and documentary of the event'],
+            ['id' => 12, 'collaboration_area_id' => 12, 'language' => 'en', 'value' => 'Graphic art and graphic material'],
+            ['id' => 13, 'collaboration_area_id' => 13, 'language' => 'en', 'value' => 'Collaborative communication (real-time dissemination on social media)'],
+
+            // Spanish (Spain)
+            ['id' => 14, 'collaboration_area_id' => 1, 'language' => 'es', 'value' => 'En busca de patrocinio y apoyo'],
+            ['id' => 15, 'collaboration_area_id' => 2, 'language' => 'es', 'value' => 'En publicidad y difusión (redes sociales)'],
+            ['id' => 16, 'collaboration_area_id' => 3, 'language' => 'es', 'value' => 'En la organización del blog'],
+            ['id' => 17, 'collaboration_area_id' => 4, 'language' => 'es', 'value' => 'En control de inscripciones (participantes y ponentes, certificados y control de actividades)'],
+            ['id' => 18, 'collaboration_area_id' => 5, 'language' => 'es', 'value' => 'En la infraestructura tecnológica (red local y wifi, servidores y repositorios)'],
+            ['id' => 19, 'collaboration_area_id' => 6, 'language' => 'es', 'value' => 'En el taller de instalación (InstallFest) y grabación de imágenes en soporte.'],
+            ['id' => 20, 'collaboration_area_id' => 7, 'language' => 'es', 'value' => 'Tema (Otras conferencias, talleres y cursos cortos)'],
+            ['id' => 21, 'collaboration_area_id' => 8, 'language' => 'es', 'value' => 'Sistema de registro'],
+            ['id' => 22, 'collaboration_area_id' => 9, 'language' => 'es', 'value' => 'Organización de las habitaciones'],
+            ['id' => 23, 'collaboration_area_id' => 10, 'language' => 'es', 'value' => 'Visita y publicidad en otras escuelas o lugares'],
+            ['id' => 24, 'collaboration_area_id' => 11, 'language' => 'es', 'value' => 'Filmación, fotografía y documental del evento'],
+            ['id' => 25, 'collaboration_area_id' => 12, 'language' => 'es', 'value' => 'Arte gráfico y material gráfico'],
+            ['id' => 26, 'collaboration_area_id' => 13, 'language' => 'es', 'value' => 'Comunicación colaborativa (difusión en tiempo real en redes sociales)'],
+
+            // Portuguese (Brazil)
+            ['id' => 27, 'collaboration_area_id' => 1, 'language' => 'pt-BR', 'value' => 'Em busca de patrocínio e apoio'],
+            ['id' => 28, 'collaboration_area_id' => 2, 'language' => 'pt-BR', 'value' => 'Na publicidade e divulgação (redes sociais)'],
+            ['id' => 29, 'collaboration_area_id' => 3, 'language' => 'pt-BR', 'value' => 'Na organização do blog'],
+            ['id' => 30, 'collaboration_area_id' => 4, 'language' => 'pt-BR', 'value' => 'No controle de inscrições (participantes e palestrantes, certificados e controle de atividades)'],
+            ['id' => 31, 'collaboration_area_id' => 5, 'language' => 'pt-BR', 'value' => 'Na infraestrutura tecnológica (rede local e wifi, servidores e repositórios)'],
+            ['id' => 32, 'collaboration_area_id' => 6, 'language' => 'pt-BR', 'value' => 'Na oficina de instalação (InstallFest) e gravação de imagens em mídia'],
+            ['id' => 33, 'collaboration_area_id' => 7, 'language' => 'pt-BR', 'value' => 'Tema (Outras palestras, workshops e minicursos)'],
+            ['id' => 34, 'collaboration_area_id' => 8, 'language' => 'pt-BR', 'value' => 'Sistema de registro'],
+            ['id' => 35, 'collaboration_area_id' => 9, 'language' => 'pt-BR', 'value' => 'Organização das salas'],
+            ['id' => 36, 'collaboration_area_id' => 10, 'language' => 'pt-BR', 'value' => 'Visita e divulgação em outras escolas ou lugares'],
+            ['id' => 37, 'collaboration_area_id' => 11, 'language' => 'pt-BR', 'value' => 'Filmagem, fotografia e documentário do evento'],
+            ['id' => 38, 'collaboration_area_id' => 12, 'language' => 'pt-BR', 'value' => 'Arte gráfica e material gráfico'],
+            ['id' => 39, 'collaboration_area_id' => 13, 'language' => 'pt-BR', 'value' => 'Comunicação colaborativa (divulgação em tempo real nas redes sociais)'],
+        ]);
     }
 }

@@ -22,8 +22,9 @@ return new class extends Migration {
             $table->text('audit_note')->nullable();
             $table->tinyInteger('approved')->nullable();
             $table->timestamp('confirmed_at')->nullable();
-            $table->timestamps();
-            $table->timestamp('removed_at')->nullable();
+            $table->timestamp('created_at')->nullable()->comment('When this it\'s created');
+            $table->timestamp('updated_at')->nullable()->comment('When this it\'s updated');
+            $table->timestamp('removed_at')->nullable()->comment('When this it\'s removed');
             $table->index(['audited_at'], 'collaborators_audited_at_index');
             $table->index(['approved'], 'collaborators_approved_index');
             $table->index(['confirmed_at'], 'collaborators_confirmed_at_index');
