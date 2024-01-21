@@ -25,7 +25,7 @@ return new class extends Migration {
     {
         Schema::create('distros', function (Blueprint $table) {
             // Description of the 'distros' table purpose.
-            $table->comment('Open source distributions');
+            $table->comment('Distributions');
 
             // Adding a unique identifier for each entry in the table.
             $table->id()->comment('Identification');

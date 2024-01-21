@@ -4,44 +4,75 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
+/**
+ * Migration for creating and managing the 'persons' table.
+ *
+ * This migration class is responsible for establishing the 'persons' table in the database,
+ * intended to store detailed information about individuals. It covers a wide range of data,
+ * including personal details, contact information, addresses, and relational links to other
+ * tables such as countries, states, cities, and more. The class includes methods for creating
+ * and dropping the table as part of the database migration process.
+ */
 return new class extends Migration {
+
     /**
-     * Run the migrations.
+     * Executes the migration to create the 'persons' table.
+     *
+     * This method, when invoked, sets up the structure of the 'persons' table,
+     * defining columns for various types of information and creating indexes for
+     * efficient data retrieval and querying.
      */
     public function up(): void
     {
         Schema::create('persons', function (Blueprint $table) {
-            $table->id();
-            $table->unsignedBigInteger('responsible_id')->nullable();
+            // Description of the 'persons' table's purpose.
+            $table->comment('Persons');
+
+            // Creating a unique identifier for each person.
+            $table->id()->comment('Identification');
+
+            // Columns for relational links to other tables, including self-referencing.
+            $table->unsignedBigInteger('responsible_id')->nullable()->comment('Identification of Responsible');
             $table->foreign('responsible_id')->references('id')->on('persons');
-            $table->string('name', 80);
-            $table->string('federal_code', 50);
-            $table->string('email', 150);
-            $table->string('phone', 40);
-            $table->string('address', 255)->nullable();
-            $table->string('address_neighborhood', 255)->nullable();
-            $table->unsignedBigInteger('address_city_id')->nullable();
+
+            // Columns for personal information such as name and federal code.
+            $table->string('name', 80)->comment('Name');
+            $table->string('federal_code', 50)->comment('Federal Code');
+
+            // Contact information columns including email and phone number.
+            $table->string('email', 150)->comment('E-mail');
+            $table->string('phone', 40)->comment('Phone');
+
+            // Columns for detailed address information.
+            $table->string('address', 255)->nullable()->comment('Address');
+            $table->string('address_neighborhood', 255)->nullable()->comment('Neighborhood of Address');
+            $table->unsignedBigInteger('address_city_id')->nullable()->comment('Identification of City of Address');
             $table->foreign('address_city_id')->references('id')->on('cities');
-            $table->string('address_city', 255)->nullable();
-            $table->unsignedBigInteger('address_state_id')->nullable();
+            $table->string('address_city', 255)->nullable()->comment('City of Address');
+            $table->unsignedBigInteger('address_state_id')->nullable()->comment('Identification of State of Address');
             $table->foreign('address_state_id')->references('id')->on('states');
-            $table->string('address_state', 255)->nullable();
-            $table->unsignedBigInteger('address_country_id')->nullable();
+            $table->string('address_state', 255)->nullable()->comment('State of Address');
+            $table->unsignedBigInteger('address_country_id')->nullable()->comment('Identification of Country of Address');
             $table->foreign('address_country_id')->references('id')->on('countries');
-            $table->string('address_country', 255)->nullable();
-            $table->string('photo', 255)->nullable();
-            $table->text('bio')->nullable();
-            $table->string('site', 255)->nullable();
-            $table->tinyInteger('use_free');
-            $table->unsignedBigInteger('distro_id')->nullable();
-            $table->foreign('distro_id')->references('id')->on('distros');
-            $table->unsignedBigInteger('student_info_id')->nullable();
-            $table->foreign('student_info_id')->references('id')->on('student_infos');
-            $table->string('student_place', 255)->nullable();
-            $table->string('student_course', 255)->nullable();
-            $table->timestamp('created_at')->nullable()->comment('When this it\'s created');
-            $table->timestamp('updated_at')->nullable()->comment('When this it\'s updated');
-            $table->timestamp('removed_at')->nullable()->comment('When this it\'s removed');
+            $table->string('address_country', 255)->nullable()->comment('Country of Address');
+
+            // Geographical data columns for spatial analysis.
+            $table->decimal('address_lat', 15, 10)->nullable()->comment('Latitude of Address');
+            $table->decimal('address_lon', 15, 10)->nullable()->comment('Longitude of Address');
+            $table->point('address_location')->nullable()->comment('Location of Address (for Spatial Analysis Functions)');
+
+            // Columns for additional personal details like photo, bio, and website.
+            $table->string('photo', 255)->nullable()->comment('Photo');
+            $table->text('bio')->nullable()->comment('Biography');
+            $table->string('site', 255)->nullable()->comment('Site');
+            $table->tinyInteger('use_free')->comment('Use free softwares?');
+
+            // Timestamps for tracking the creation, update, and removal of records.
+            $table->timestamp('created_at')->nullable()->comment('When created');
+            $table->timestamp('updated_at')->nullable()->comment('When updated');
+            $table->timestamp('removed_at')->nullable()->comment('When removed');
+
+            // Setting up indexes for efficient data retrieval.
             $table->index(['name'], 'persons_name_index');
             $table->index(['federal_code'], 'persons_federal_code_index');
             $table->index(['email'], 'persons_email_index');
@@ -51,19 +82,24 @@ return new class extends Migration {
             $table->index(['address_city'], 'persons_address_city_index');
             $table->index(['address_state'], 'persons_address_state_index');
             $table->index(['address_country'], 'persons_address_country_index');
+            $table->index(['address_lat'], 'units_address_lat_index');
+            $table->index(['address_lon'], 'units_address_lon_index');
+            $table->index(['address_location'], 'units_address_location_index');
             $table->index(['site'], 'persons_site_index');
             $table->index(['use_free'], 'persons_use_free_index');
-            $table->index(['student_place'], 'persons_student_place_index');
-            $table->index(['student_course'], 'persons_student_course_index');
             $table->index(['removed_at'], 'persons_removed_at_index');
         });
     }
 
     /**
-     * Reverse the migrations.
+     * Reverses the migration by removing the 'persons' table.
+     *
+     * This method is called when the migration needs to be rolled back. It handles
+     * the removal of the 'persons' table from the database, undoing the changes made in the up() method.
      */
     public function down(): void
     {
         Schema::dropIfExists('persons');
     }
+
 };

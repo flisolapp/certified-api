@@ -11,10 +11,11 @@ return new class extends Migration {
     public function up(): void
     {
         Schema::create('talks', function (Blueprint $table) {
-            $table->id();
-            $table->unsignedBigInteger('edition_id');
+            $table->comment('Talks');
+            $table->id()->comment('Identification');
+            $table->unsignedBigInteger('edition_id')->comment('Identification of Edition');
             $table->foreign('edition_id')->references('id')->on('editions');
-            $table->unsignedBigInteger('unit_id');
+            $table->unsignedBigInteger('unit_id')->comment('Identification of Unit');
             $table->foreign('unit_id')->references('id')->on('units');
             $table->unsignedBigInteger('talk_subject_id');
             $table->foreign('talk_subject_id')->references('id')->on('talk_subjects');
