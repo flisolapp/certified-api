@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class CollaborationAreaI18n extends Model
 {
@@ -15,4 +16,11 @@ class CollaborationAreaI18n extends Model
      * @var string
      */
     protected $table = 'collaboration_areas_i18n';
+
+    public $timestamps = false;
+
+    public function parent(): BelongsTo
+    {
+        return $this->belongsTo(CollaborationArea::class);
+    }
 }

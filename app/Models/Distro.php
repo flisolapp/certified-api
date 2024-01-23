@@ -15,4 +15,6 @@ class Distro extends Model
      * @var string
      */
     protected $table = 'distros';
+
+    public $timestamps = false;
 }

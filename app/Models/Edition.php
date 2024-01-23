@@ -21,4 +21,14 @@ class Edition extends Model
     {
         return $this->hasMany(Unit::class);
     }
+
+    public function organizers(): HasMany
+    {
+        return $this->hasMany(Organizer::class);
+    }
+
+    public function collaborators(): HasMany
+    {
+        return $this->hasMany(Collaborator::class);
+    }
 }

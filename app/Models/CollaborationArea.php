@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class CollaborationArea extends Model
 {
@@ -15,4 +16,11 @@ class CollaborationArea extends Model
      * @var string
      */
     protected $table = 'collaboration_areas';
+
+    public $timestamps = false;
+
+    public function translates(): HasMany
+    {
+        return $this->hasMany(CollaborationAreaI18n::class);
+    }
 }

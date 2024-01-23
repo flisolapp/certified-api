@@ -4,9 +4,9 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 
-class StudentInfoI18n extends Model
+class TalkSubject extends Model
 {
     use HasFactory;
 
@@ -15,12 +15,12 @@ class StudentInfoI18n extends Model
      *
      * @var string
      */
-    protected $table = 'student_infos_i18n';
+    protected $table = 'talk_subjects';
 
     public $timestamps = false;
 
-    public function parent(): BelongsTo
+    public function translates(): HasMany
     {
-        return $this->belongsTo(StudentInfo::class);
+        return $this->hasMany(TalkSubjectI18n::class);
     }
 }
