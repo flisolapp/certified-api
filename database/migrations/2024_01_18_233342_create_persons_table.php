@@ -32,8 +32,8 @@ return new class extends Migration {
             $table->id()->comment('Identification');
 
             // Columns for relational links to other tables, including self-referencing.
-            $table->unsignedBigInteger('responsible_id')->nullable()->comment('Identification of Responsible');
-            $table->foreign('responsible_id')->references('id')->on('persons');
+            $table->unsignedBigInteger('parent_id')->nullable()->comment('Identification of Parent');
+            $table->foreign('parent_id')->references('id')->on('persons');
 
             // Columns for personal information such as name and federal code.
             $table->string('name', 80)->comment('Name');
@@ -82,9 +82,9 @@ return new class extends Migration {
             $table->index(['address_city'], 'persons_address_city_index');
             $table->index(['address_state'], 'persons_address_state_index');
             $table->index(['address_country'], 'persons_address_country_index');
-            $table->index(['address_lat'], 'units_address_lat_index');
-            $table->index(['address_lon'], 'units_address_lon_index');
-            $table->index(['address_location'], 'units_address_location_index');
+            $table->index(['address_lat'], 'persons_address_lat_index');
+            $table->index(['address_lon'], 'persons_address_lon_index');
+            $table->index(['address_location'], 'persons_address_location_index');
             $table->index(['site'], 'persons_site_index');
             $table->index(['use_free'], 'persons_use_free_index');
             $table->index(['removed_at'], 'persons_removed_at_index');

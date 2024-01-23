@@ -39,7 +39,7 @@ return new class extends Migration {
 
             // Setting up indexes for efficient data retrieval.
             $table->index(['language'], 'talk_subjects_i18n_language_index');
-            $table->index(['value'], 'talk_subjects_value_index');
+            $table->index(['value'], 'talk_subjects_i18n_value_index');
         });
     }
 
