@@ -22,11 +22,16 @@ class LocatesFromCountryStateCitySeeder extends Seeder
     {
         ini_set('memory_limit', '1024M');
 
-        DB::statement('SET FOREIGN_KEY_CHECKS=0');
-        DB::table('cities')->truncate();
-        DB::table('states')->truncate();
-        DB::table('countries')->truncate();
-        DB::statement('SET FOREIGN_KEY_CHECKS=1');
+        $connection = config('database.default');
+        $driver = config('database.connections.' . $connection . '.driver');
+
+        if ($driver === 'mysql') {
+            DB::statement('SET FOREIGN_KEY_CHECKS=0');
+            DB::table('cities')->truncate();
+            DB::table('states')->truncate();
+            DB::table('countries')->truncate();
+            DB::statement('SET FOREIGN_KEY_CHECKS=1');
+        }
 
         $zip = new ZipArchive();
         $res = $zip->open(resource_path($this->zipFile));
@@ -40,6 +45,12 @@ class LocatesFromCountryStateCitySeeder extends Seeder
                 $countries = json_decode($json);
 
                 foreach ($countries as $country) {
+                    $location = null;
+
+                    if ($driver === 'mysql') {
+                        $location = DB::raw('GeomFromText(\'POINT(' . $country->latitude . ' ' . $country->longitude . ')\')');
+                    }
+
                     DB::table('countries')->insert([[
                         'id' => $country->id,
                         'name' => $country->name,
@@ -47,7 +58,7 @@ class LocatesFromCountryStateCitySeeder extends Seeder
                         'iso3' => $country->iso3,
                         'lat' => $country->latitude,
                         'lon' => $country->longitude,
-                        'location' => DB::raw('GeomFromText(\'POINT(' . $country->latitude . ' ' . $country->longitude . ')\')'),
+                        'location' => $location,
                         'created_at' => Carbon::now(),
                         'updated_at' => Carbon::now(),
                     ]]);
@@ -70,6 +81,12 @@ class LocatesFromCountryStateCitySeeder extends Seeder
                     DB::table('countries_i18n')->insert($countriesI18n);
 
                     foreach ($country->states as $state) {
+                        $location = null;
+
+                        if ($driver === 'mysql') {
+                            $location = DB::raw('GeomFromText(\'POINT(' . $state->latitude . ' ' . $state->longitude . ')\')');
+                        }
+
                         DB::table('states')->insert([
                             'id' => $state->id,
                             'country_id' => $countryId,
@@ -77,7 +94,7 @@ class LocatesFromCountryStateCitySeeder extends Seeder
                             'code' => $state->state_code,
                             'lat' => $state->latitude,
                             'lon' => $state->longitude,
-                            'location' => DB::raw('GeomFromText(\'POINT(' . $state->latitude . ' ' . $state->longitude . ')\')'),
+                            'location' => $location,
                             'cities_found' => 0,
                             'created_at' => Carbon::now(),
                             'updated_at' => Carbon::now(),
@@ -87,6 +104,12 @@ class LocatesFromCountryStateCitySeeder extends Seeder
                         $cities = [];
 
                         foreach ($state->cities as $city) {
+                            $location = null;
+
+                            if ($driver === 'mysql') {
+                                $location = DB::raw('GeomFromText(\'POINT(' . $city->latitude . ' ' . $city->longitude . ')\')');
+                            }
+
                             $cities[] = [
                                 'id' => $city->id,
                                 'country_id' => $countryId,
@@ -94,7 +117,7 @@ class LocatesFromCountryStateCitySeeder extends Seeder
                                 'name' => $city->name,
                                 'lat' => $city->latitude,
                                 'lon' => $city->longitude,
-                                'location' => DB::raw('GeomFromText(\'POINT(' . $city->latitude . ' ' . $city->longitude . ')\')'),
+                                'location' => $location,
                                 'created_at' => Carbon::now(),
                                 'updated_at' => Carbon::now(),
                             ];

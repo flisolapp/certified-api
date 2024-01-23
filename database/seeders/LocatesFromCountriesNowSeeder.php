@@ -22,11 +22,18 @@ class LocatesFromCountriesNowSeeder extends Seeder
      */
     public function run(): void
     {
-        DB::statement('SET FOREIGN_KEY_CHECKS=0');
-        DB::table('cities')->truncate();
-        DB::table('states')->truncate();
-        DB::table('countries')->truncate();
-        DB::statement('SET FOREIGN_KEY_CHECKS=1');
+        ini_set('memory_limit', '1024M');
+
+        $connection = config('database.default');
+        $driver = config('database.connections.' . $connection . '.driver');
+
+        if ($driver === 'mysql') {
+            DB::statement('SET FOREIGN_KEY_CHECKS=0');
+            DB::table('cities')->truncate();
+            DB::table('states')->truncate();
+            DB::table('countries')->truncate();
+            DB::statement('SET FOREIGN_KEY_CHECKS=1');
+        }
 
         $client = new Client(['curl' => [CURLOPT_SSL_VERIFYPEER => false]]);
 

@@ -108,3 +108,9 @@ Migration (with Prune):
 ```bash
 php artisan schema:dump --prune
 ```
+
+# Test
+
+```bash
+php artisan test
+```
