@@ -35,7 +35,7 @@ return new class extends Migration {
             // Columns for linking to the 'collaborators' and 'collaboration_availabilities' tables.
             $table->unsignedBigInteger('collaborator_id')->comment('Identification of Collaborator');
             $table->foreign('collaborator_id')->references('id')->on('collaborators');
-            $table->unsignedBigInteger('collaboration_availability_id')->comment('Identification of Availability of Collaborator');
+            $table->unsignedBigInteger('collaboration_availability_id')->comment('Identification of Availability of Collaboration');
             $table->foreign('collaboration_availability_id', 'collaborators_availabilities_ca_id_foreign')->references('id')->on('collaboration_availabilities');
 
             // Timestamps for tracking the creation, update, and removal of records.

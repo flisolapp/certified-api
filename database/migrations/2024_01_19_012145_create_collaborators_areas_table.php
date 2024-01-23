@@ -35,7 +35,7 @@ return new class extends Migration {
             // Columns for linking to the 'collaborators' and 'collaboration_areas' tables.
             $table->unsignedBigInteger('collaborator_id')->comment('Identification of Collaborator');
             $table->foreign('collaborator_id')->references('id')->on('collaborators');
-            $table->unsignedBigInteger('collaboration_area_id')->comment('Identification of Area of Collaborator');
+            $table->unsignedBigInteger('collaboration_area_id')->comment('Identification of Area of Collaboration');
             $table->foreign('collaboration_area_id')->references('id')->on('collaboration_areas');
 
             // Timestamps for tracking the creation, update, and removal of records.
