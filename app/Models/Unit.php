@@ -47,4 +47,19 @@ class Unit extends Model
     {
         return $this->hasMany(Collaborator::class);
     }
+
+    public function speakers(): HasMany
+    {
+        return $this->hasMany(Speaker::class);
+    }
+
+    public function participants(): HasMany
+    {
+        return $this->hasMany(Participant::class);
+    }
+
+    public function talks(): HasMany
+    {
+        return $this->hasMany(Talk::class);
+    }
 }
