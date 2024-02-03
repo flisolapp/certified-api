@@ -19,19 +19,19 @@ class TalkShiftSeeder extends Seeder
         ]);
         DB::table('talk_shifts_i18n')->insertOrIgnore([
             // English (USA)
-            ['id' => 1, 'talk_shift_id' => 1, 'language' => 'en', 'value' => 'Morning'],
-            ['id' => 2, 'talk_shift_id' => 2, 'language' => 'en', 'value' => 'Afternoon'],
-            ['id' => 3, 'talk_shift_id' => 3, 'language' => 'en', 'value' => 'Night'],
+            ['id' => 1, 'parent_id' => 1, 'language' => 'en', 'value' => 'Morning'],
+            ['id' => 2, 'parent_id' => 2, 'language' => 'en', 'value' => 'Afternoon'],
+            ['id' => 3, 'parent_id' => 3, 'language' => 'en', 'value' => 'Night'],
 
             // Spanish (Spain)
-            ['id' => 4, 'talk_shift_id' => 1, 'language' => 'en', 'value' => 'Mañana'],
-            ['id' => 5, 'talk_shift_id' => 2, 'language' => 'en', 'value' => 'Tarde'],
-            ['id' => 6, 'talk_shift_id' => 3, 'language' => 'en', 'value' => 'Noche'],
+            ['id' => 4, 'parent_id' => 1, 'language' => 'es', 'value' => 'Mañana'],
+            ['id' => 5, 'parent_id' => 2, 'language' => 'es', 'value' => 'Tarde'],
+            ['id' => 6, 'parent_id' => 3, 'language' => 'es', 'value' => 'Noche'],
 
             // Portuguese (Brazil)
-            ['id' => 7, 'talk_shift_id' => 1, 'language' => 'en', 'value' => 'Manhã'],
-            ['id' => 8, 'talk_shift_id' => 2, 'language' => 'en', 'value' => 'Tarde'],
-            ['id' => 9, 'talk_shift_id' => 3, 'language' => 'en', 'value' => 'Noite'],
+            ['id' => 7, 'parent_id' => 1, 'language' => 'pt-BR', 'value' => 'Manhã'],
+            ['id' => 8, 'parent_id' => 2, 'language' => 'pt-BR', 'value' => 'Tarde'],
+            ['id' => 9, 'parent_id' => 3, 'language' => 'pt-BR', 'value' => 'Noite'],
         ]);
     }
 }

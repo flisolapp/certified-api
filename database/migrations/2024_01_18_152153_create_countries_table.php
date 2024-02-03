@@ -30,10 +30,11 @@ return new class extends Migration {
             // Creating a unique identifier for each country.
             $table->id()->comment('Identification');
 
-            // Adding columns for country name and ISO codes.
+            // Adding columns for country name, ISO codes and phone code.
             $table->string('name', 255)->comment('Name');
-            $table->char('iso2', 2)->comment('ISO-2');
-            $table->char('iso3', 3)->comment('ISO-3');
+            $table->char('iso2', 2)->nullable()->comment('ISO-2');
+            $table->char('iso3', 3)->nullable()->comment('ISO-3');
+            $table->char('phone_code', 255)->nullable()->comment('Phone Code');
 
             // Storing geographic coordinates and location for spatial analysis.
             $table->decimal('lat', 15, 10)->nullable()->comment('Latitude');
@@ -49,6 +50,7 @@ return new class extends Migration {
             $table->index(['name'], 'countries_name_index');
             $table->index(['iso2'], 'countries_iso2_index');
             $table->index(['iso3'], 'countries_iso3_index');
+            $table->index(['phone_code'], 'countries_phone_code_index');
             $table->index(['removed_at'], 'countries_removed_at_index');
         });
     }

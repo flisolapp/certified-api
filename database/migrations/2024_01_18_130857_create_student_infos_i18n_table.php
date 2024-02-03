@@ -29,8 +29,8 @@ return new class extends Migration {
             $table->id()->comment('Identification');
 
             // Linking to the 'student_infos' table with a foreign key.
-            $table->unsignedBigInteger('student_info_id')->comment('Identification of Information of Student');
-            $table->foreign('student_info_id')->references('id')->on('student_infos');
+            $table->unsignedBigInteger('parent_id')->comment('Identification of Information of Student');
+            $table->foreign('parent_id')->references('id')->on('student_infos');
 
             // Adding columns for specifying the language and the translated information.
             $table->string('language', 10)->comment('Language');

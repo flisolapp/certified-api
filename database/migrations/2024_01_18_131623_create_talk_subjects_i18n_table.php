@@ -30,8 +30,8 @@ return new class extends Migration {
             $table->id()->comment('Identification');
 
             // Linking to the 'talk_subjects' table with a foreign key.
-            $table->unsignedBigInteger('talk_subject_id')->comment('Identification of Subject of Talk');
-            $table->foreign('talk_subject_id')->references('id')->on('talk_subjects');
+            $table->unsignedBigInteger('parent_id')->comment('Identification of Subject of Talk');
+            $table->foreign('parent_id')->references('id')->on('talk_subjects');
 
             // Adding columns to specify the language and the internationalized value.
             $table->string('language', 10)->comment('Language');

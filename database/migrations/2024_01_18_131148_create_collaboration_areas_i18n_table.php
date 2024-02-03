@@ -29,8 +29,8 @@ return new class extends Migration {
             $table->id()->comment('Identification');
 
             // Linking to the 'collaboration_areas' table with a foreign key.
-            $table->unsignedBigInteger('collaboration_area_id')->comment('Identification of Area of Collaboration');
-            $table->foreign('collaboration_area_id')->references('id')->on('collaboration_areas');
+            $table->unsignedBigInteger('parent_id')->comment('Identification of Area of Collaboration');
+            $table->foreign('parent_id')->references('id')->on('collaboration_areas');
 
             // Adding columns to specify the language and the internationalized value.
             $table->string('language', 10)->comment('Language');

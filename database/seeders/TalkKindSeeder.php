@@ -18,16 +18,16 @@ class TalkKindSeeder extends Seeder
         ]);
         DB::table('talk_kinds_i18n')->insertOrIgnore([
             // English (USA)
-            ['id' => 1, 'talk_kind_id' => 1, 'language' => 'en', 'value' => 'Lecture'],
-            ['id' => 2, 'talk_kind_id' => 2, 'language' => 'en', 'value' => 'Workshop'],
+            ['id' => 1, 'parent_id' => 1, 'language' => 'en', 'value' => 'Lecture'],
+            ['id' => 2, 'parent_id' => 2, 'language' => 'en', 'value' => 'Workshop'],
 
             // Spanish (Spain)
-            ['id' => 3, 'talk_kind_id' => 1, 'language' => 'es', 'value' => 'Conferencia'],
-            ['id' => 4, 'talk_kind_id' => 2, 'language' => 'es', 'value' => 'Taller'],
+            ['id' => 3, 'parent_id' => 1, 'language' => 'es', 'value' => 'Conferencia'],
+            ['id' => 4, 'parent_id' => 2, 'language' => 'es', 'value' => 'Taller'],
 
-            // English (USA)
-            ['id' => 5, 'talk_kind_id' => 1, 'language' => 'pt-BR', 'value' => 'Palestra'],
-            ['id' => 6, 'talk_kind_id' => 2, 'language' => 'pt-BR', 'value' => 'Oficina'],
+            // Portuguese (Brazil)
+            ['id' => 5, 'parent_id' => 1, 'language' => 'pt-BR', 'value' => 'Palestra'],
+            ['id' => 6, 'parent_id' => 2, 'language' => 'pt-BR', 'value' => 'Oficina'],
         ]);
     }
 }

@@ -38,6 +38,11 @@ class Unit extends Model
         return $this->belongsTo(Country::class);
     }
 
+    public function schedules(): HasMany
+    {
+        return $this->hasMany(UnitSchedule::class);
+    }
+
     public function organizers(): HasMany
     {
         return $this->hasMany(Organizer::class);

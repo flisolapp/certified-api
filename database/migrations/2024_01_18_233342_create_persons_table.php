@@ -37,11 +37,16 @@ return new class extends Migration {
 
             // Columns for personal information such as name and federal code.
             $table->string('name', 80)->comment('Name');
-            $table->string('federal_code', 50)->comment('Federal Code');
+            $table->string('federal_code', 50)->nullable()->comment('Federal Code');
 
-            // Contact information columns including email and phone number.
-            $table->string('email', 150)->comment('E-mail');
-            $table->string('phone', 40)->comment('Phone');
+            // Contact information columns including email, password and phone number.
+            $table->string('email', 150)->nullable()->unique()->comment('E-mail');
+            $table->timestamp('email_verified_at')->nullable()->comment('When e-mail was verified');
+            $table->string('password', 60)->nullable()->comment('Password');
+            $table->unsignedBigInteger('phone_country_id')->nullable()->comment('Identification of Country of Phone');
+            $table->foreign('phone_country_id')->references('id')->on('countries');
+            $table->string('phone_code', 10)->nullable()->comment('Phone Code');
+            $table->string('phone', 40)->nullable()->comment('Phone');
 
             // Columns for detailed address information.
             $table->string('address', 255)->nullable()->comment('Address');
@@ -55,6 +60,7 @@ return new class extends Migration {
             $table->unsignedBigInteger('address_country_id')->nullable()->comment('Identification of Country of Address');
             $table->foreign('address_country_id')->references('id')->on('countries');
             $table->string('address_country', 255)->nullable()->comment('Country of Address');
+            $table->string('address_zipcode', 50)->nullable()->comment('ZIP Code of Address');
 
             // Geographical data columns for spatial analysis.
             $table->decimal('address_lat', 15, 10)->nullable()->comment('Latitude of Address');
@@ -66,6 +72,14 @@ return new class extends Migration {
             $table->text('bio')->nullable()->comment('Biography');
             $table->string('site', 255)->nullable()->comment('Site');
             $table->tinyInteger('use_free')->comment('Use free softwares?');
+            $table->unsignedBigInteger('distro_id')->nullable()->comment('Identification of Distribution');
+            $table->foreign('distro_id')->references('id')->on('distros');
+            $table->unsignedBigInteger('student_info_id')->nullable()->comment('Identification of Information of Student');
+            $table->foreign('student_info_id')->references('id')->on('student_infos');
+            $table->string('student_place', 255)->nullable()->comment('Place of Student');
+            $table->string('student_course', 255)->nullable()->comment('Place of Course');
+
+            $table->tinyInteger('active')->nullable()->comment('Active');
 
             // Timestamps for tracking the creation, update, and removal of records.
             $table->timestamp('created_at')->nullable()->comment('When created');
@@ -76,17 +90,23 @@ return new class extends Migration {
             $table->index(['name'], 'persons_name_index');
             $table->index(['federal_code'], 'persons_federal_code_index');
             $table->index(['email'], 'persons_email_index');
+            $table->index(['email_verified_at'], 'persons_email_verified_at_index');
+            $table->index(['phone_code'], 'persons_phone_code_index');
             $table->index(['phone'], 'persons_phone_index');
             $table->index(['address'], 'persons_address_index');
             $table->index(['address_neighborhood'], 'persons_address_neighborhood_index');
             $table->index(['address_city'], 'persons_address_city_index');
             $table->index(['address_state'], 'persons_address_state_index');
             $table->index(['address_country'], 'persons_address_country_index');
+            $table->index(['address_zipcode'], 'persons_address_zipcode_index');
             $table->index(['address_lat'], 'persons_address_lat_index');
             $table->index(['address_lon'], 'persons_address_lon_index');
             $table->index(['address_location'], 'persons_address_location_index');
             $table->index(['site'], 'persons_site_index');
             $table->index(['use_free'], 'persons_use_free_index');
+            $table->index(['student_place'], 'persons_student_place_index');
+            $table->index(['student_course'], 'persons_student_course_index');
+            $table->index(['active'], 'persons_active_index');
             $table->index(['removed_at'], 'persons_removed_at_index');
         });
     }

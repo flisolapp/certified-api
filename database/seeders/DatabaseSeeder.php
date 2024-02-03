@@ -29,6 +29,7 @@ class DatabaseSeeder extends Seeder
             TalkKindSeeder::class,
             // LocatesFromCountriesNowSeeder::class,
             LocatesFromCountryStateCitySeeder::class,
+            UnitScheduleKindSeeder::class,
             EditionSeeder::class,
         ]);
     }

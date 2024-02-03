@@ -51,11 +51,25 @@ class LocatesFromCountryStateCitySeeder extends Seeder
                         $location = DB::raw('GeomFromText(\'POINT(' . $country->latitude . ' ' . $country->longitude . ')\')');
                     }
 
+                    $phone_code = null;
+                    if (!is_null($country->phone_code)) {
+                        $phone_code = $country->phone_code;
+                        $phone_code = str_replace('+', '', $phone_code);
+
+                        $parts = explode(' ', $phone_code);
+                        if (count($parts) > 0) {
+                            $phone_code = $parts[0];
+                        }
+
+                        $phone_code = '+' . $phone_code;
+                    }
+
                     DB::table('countries')->insert([[
                         'id' => $country->id,
                         'name' => $country->name,
                         'iso2' => $country->iso2,
                         'iso3' => $country->iso3,
+                        'phone_code' => $phone_code,
                         'lat' => $country->latitude,
                         'lon' => $country->longitude,
                         'location' => $location,
@@ -66,14 +80,14 @@ class LocatesFromCountryStateCitySeeder extends Seeder
 
                     $countriesI18n = [];
                     $countriesI18n[] = [
-                        'country_id' => $countryId,
+                        'parent_id' => $countryId,
                         'language' => 'en',
                         'name' => $country->name
                     ];
 
                     foreach ($country->translations as $language => $name) {
                         $countriesI18n[] = [
-                            'country_id' => $countryId,
+                            'parent_id' => $countryId,
                             'language' => $language,
                             'name' => $name,
                         ];

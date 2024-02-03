@@ -30,8 +30,8 @@ return new class extends Migration {
             $table->id()->comment('Identification');
 
             // Linking to the 'countries' table with a foreign key.
-            $table->unsignedBigInteger('country_id')->comment('Identification of Country');
-            $table->foreign('country_id')->references('id')->on('countries');
+            $table->unsignedBigInteger('parent_id')->comment('Identification of Country');
+            $table->foreign('parent_id')->references('id')->on('countries');
 
             // Adding columns to specify the language and the internationalized name.
             $table->string('language', 10)->comment('Language');

@@ -30,8 +30,8 @@ return new class extends Migration {
             $table->id()->comment('Identification');
 
             // Linking to the 'collaboration_availabilities' table with a foreign key.
-            $table->unsignedBigInteger('collaboration_availability_id')->comment('Identification of Availability of Collaboration');
-            $table->foreign('collaboration_availability_id', 'collaboration_availabilities_i18n_ca_id_foreign')->references('id')->on('collaboration_availabilities');
+            $table->unsignedBigInteger('parent_id')->comment('Identification of Availability of Collaboration');
+            $table->foreign('parent_id', 'collaboration_availabilities_i18n_ca_id_foreign')->references('id')->on('collaboration_availabilities');
 
             // Adding columns to specify the language and the internationalized value.
             $table->string('language', 10)->comment('Language');

@@ -8,19 +8,19 @@ use Illuminate\Support\Facades\Schema;
  * Migration for creating and managing the 'units' table.
  *
  * This migration is responsible for setting up the 'units' table in the database.
- * The table is designed to store information about various units, such as their names,
- * acronyms, addresses, and operational details, along with their relationships to editions,
- * cities, states, and countries. It includes methods for creating and dropping the table
+ * The table is designed to store information about various units, including their names,
+ * acronyms, addresses, and operational details, as well as their relationships to editions,
+ * cities, states, and countries. It encompasses methods for creating and dropping the table
  * as part of the database migration process.
  */
 return new class extends Migration {
 
     /**
-     * Runs the migration to create the 'units' table.
+     * Executes the migration to create the 'units' table.
      *
-     * This method is executed when the migration is invoked. It sets up the
-     * structure of the 'units' table, specifying columns for storing detailed information about
-     * each unit, including location details and operational timings, and sets up indexes for efficient data retrieval.
+     * This method sets up the structure of the 'units' table, defining columns for storing detailed
+     * information about each unit, including location details and operational timings, and establishes
+     * relationships with other entities. It also sets up indexes for efficient data retrieval.
      */
     public function up(): void
     {
@@ -31,13 +31,15 @@ return new class extends Migration {
             // Creating a unique identifier for each unit record.
             $table->id()->comment('Identification');
 
-            // Linking to the 'editions' table with a foreign key.
+            // Column for linking units to editions.
             $table->unsignedBigInteger('edition_id')->comment('Identification of Edition');
             $table->foreign('edition_id')->references('id')->on('editions');
 
-            // Adding columns for unit name, acronym, and address details.
+            // Columns for unit details such as name and acronym.
             $table->string('name', 80)->comment('Name');
             $table->string('acronym', 30)->comment('Acronym');
+
+            // Columns for detailed address information.
             $table->string('address', 255)->nullable()->comment('Address');
             $table->string('address_neighborhood', 255)->nullable()->comment('Neighborhood of Address');
             $table->unsignedBigInteger('address_city_id')->nullable()->comment('Identification of City of Address');
@@ -49,14 +51,12 @@ return new class extends Migration {
             $table->unsignedBigInteger('address_country_id')->nullable()->comment('Identification of Country of Address');
             $table->foreign('address_country_id')->references('id')->on('countries');
             $table->string('address_country', 255)->nullable()->comment('Country of Address');
+            $table->string('address_zipcode', 50)->nullable()->comment('ZIP Code of Address');
             $table->decimal('address_lat', 15, 10)->nullable()->comment('Latitude of Address');
             $table->decimal('address_lon', 15, 10)->nullable()->comment('Longitude of Address');
             $table->point('address_location')->nullable()->comment('Location of Address (for Spatial Analysis Functions)');
 
-            // Columns for operational timings.
-            $table->date('when_at')->nullable()->comment('The day when it happens');
-            $table->time('when_start_at')->nullable()->comment('The time when it starts');
-            $table->time('when_end_at')->nullable()->comment('The time when it ends');
+            // Column for active status of the unit.
             $table->tinyInteger('active')->comment('Active');
 
             // Timestamps for tracking the creation, update, and removal of records.
@@ -72,12 +72,10 @@ return new class extends Migration {
             $table->index(['address_city'], 'units_address_city_index');
             $table->index(['address_state'], 'units_address_state_index');
             $table->index(['address_country'], 'units_address_country_index');
+            $table->index(['address_zipcode'], 'units_address_zipcode_index');
             $table->index(['address_lat'], 'units_address_lat_index');
             $table->index(['address_lon'], 'units_address_lon_index');
             $table->index(['address_location'], 'units_address_location_index');
-            $table->index(['when_at'], 'units_when_at_index');
-            $table->index(['when_start_at'], 'units_when_start_at_index');
-            $table->index(['when_end_at'], 'units_when_end_at_index');
             $table->index(['active'], 'units_active_index');
             $table->index(['removed_at'], 'units_removed_at_index');
         });
