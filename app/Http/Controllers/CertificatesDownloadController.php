@@ -2,155 +2,109 @@
 
 namespace App\Http\Controllers;
 
+use App\Helpers\CertificateHelper;
+use App\Helpers\ColorHelper;
+use App\Models\PeopleCertificate;
+use DateTime;
+use DateTimeImmutable;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Support\Facades\Response;
 use Symfony\Component\HttpFoundation\StreamedResponse;
 
 class CertificatesDownloadController extends Controller
 {
+    public function __construct(
+        private readonly CertificateHelper $certificateHelper,
+        private readonly ColorHelper $colorHelper
+    ) {}
+
     public function execute(string $code): StreamedResponse|JsonResponse
     {
-        //         $routeContext = RouteContext::fromRequest($request);
-        //        $route = $routeContext->getRoute();
-        //        // Resolve code in this scope
-        //        $code = $route->getArgument('code');
-        //
-        //        $repository = $this->em->getRepository(PeopleCertificate::class);
-        //        $qb = $repository->createQueryBuilder('pc')
-        //            ->select('pc')
-        //            ->where('pc.code = :certificateCode')
-        //            ->andWhere('pc.removedAt IS NULL')
-        //            ->setParameter('certificateCode', $code)
-        //            ->setMaxResults(1);
-        //        $q = $qb->getQuery();
-        //
-        //        /** @var PeopleCertificate[] $items */
-        //        $items = $q->execute();
-        //
-        //        $current = null;
-        //        foreach ($items as $item) //
-        //            $current = $item;
-        //
-        //        if (!is_null($current)) {
-        //            $editionDir = $this->settings['uploads']['edition'];
-        //            $name = $current->getName();
-        //            $codeVerificationUrl = 'https://certified.flisol.app/' . $current->getCode();
-        //
-        //            $font = implode(DIRECTORY_SEPARATOR, [$editionDir, $current->getEdition()?->getId(), 'NunitoSans-Bold.ttf']);
-        //
-        //            // Disable memory_limit by setting it to minus 1.
-        //            ini_set('memory_limit', '-1');
-        //
-        //            // Disable the time limit by setting it to 0.
-        //            set_time_limit(0);
-        //
-        //            $image = false;
-        //
-        //            if (!is_null($current->getOrganizer())) {
-        //                $certificateFile = implode(DIRECTORY_SEPARATOR, [$editionDir, $current->getEdition()?->getId(), 'certificate_organizer.png']);
-        //
-        //                if (file_exists($certificateFile)) {
-        //                    $image = @imagecreatefrompng($certificateFile);
-        //
-        //                    $color = imagecolorallocate($image, 240, 240, 240);
-        //                    imagefttext($image, 60, 0, 109, 471, $color, $font, $name);
-        //
-        //                    $color = imagecolorallocate($image, 254, 130, 0);
-        //                    imagefttext($image, 60, 0, 108, 470, $color, $font, $name);
-        //                }
-        //            } elseif (!is_null($current->getCollaborator())) {
-        //                $certificateFile = implode(DIRECTORY_SEPARATOR, [$editionDir, $current->getEdition()?->getId(), 'certificate_collaborator.png']);
-        //
-        //                if (file_exists($certificateFile)) {
-        //                    $image = @imagecreatefrompng($certificateFile);
-        //
-        //                    $color = imagecolorallocate($image, 240, 240, 240);
-        //                    imagefttext($image, 60, 0, 109, 471, $color, $font, $name);
-        //
-        //                    $color = imagecolorallocate($image, 254, 130, 0);
-        //                    imagefttext($image, 60, 0, 108, 470, $color, $font, $name);
-        //                }
-        //            } elseif (!is_null($current->getTalk())) {
-        //                $certificateFile = implode(DIRECTORY_SEPARATOR, [$editionDir, $current->getEdition()?->getId(), 'certificate_speaker.png']);
-        //                $title = $current->getTalk()->getTitle();
-        //
-        //                if (file_exists($certificateFile)) {
-        //                    $image = @imagecreatefrompng($certificateFile);
-        //
-        //                    $color = imagecolorallocate($image, 240, 240, 240);
-        //                    imagefttext($image, 60, 0, 109, 471, $color, $font, $name);
-        //
-        //                    $color = imagecolorallocate($image, 254, 130, 0);
-        //                    imagefttext($image, 60, 0, 108, 470, $color, $font, $name);
-        //
-        //                    $color = imagecolorallocate($image, 74, 79, 82);
-        //                    imagefttext($image, 18, 0, 114, 570, $color, $font, $title);
-        //                }
-        //            } elseif (!is_null($current->getParticipant())) {
-        //                $certificateFile = implode(DIRECTORY_SEPARATOR, [$editionDir, $current->getEdition()?->getId(), 'certificate_participant.png']);
-        //
-        //                if (file_exists($certificateFile)) {
-        //                    $image = @imagecreatefrompng($certificateFile);
-        //
-        //                    $color = imagecolorallocate($image, 240, 240, 240);
-        //                    imagefttext($image, 60, 0, 109, 471, $color, $font, $name);
-        //
-        //                    $color = imagecolorallocate($image, 254, 130, 0);
-        //                    imagefttext($image, 60, 0, 108, 470, $color, $font, $name);
-        //                }
-        //            }
-        //
-        //            if ($image) {
-        //                if (!is_null($current->getFederalCode())) //
-        //                    $this->certificateUtil->addFederalCode($image, 'CPF', $current->getFederalCode(), 12, 23);
-        //
-        //                $this->certificateUtil->addCodeVerificationUrl($image, $codeVerificationUrl, 1586, 0);
-        //                $this->certificateUtil->addQrCode($image, $codeVerificationUrl, 1280, 780);
-        //
-        //                header('Content-Type: image/png');
-        //                $data = $this->certificateUtil->getData($image);
-        //                $stream = $this->streamFactory->createStream($data);
-        //
-        //                // Update last view of certificate
-        //                $current->setLastViewAt(DateTimeImmutable::createFromMutable(new DateTime()));
-        //                $this->em->persist($current);
-        //                $this->em->flush();
-        //
-        //                return new Psr7\Response(200, ['Content-Type' => 'image/png'], $stream);
-        //            }
-        //        }
-        //
-        //        $body = Psr7\Stream::create(json_encode([
-        //                'found' => false,
-        //            ], JSON_PRETTY_PRINT) . PHP_EOL);
-        //
-        //        return new Psr7\Response(404, ['Content-Type' => 'application/json'], $body);
+        $certificate = PeopleCertificate::with(['edition', 'talk'])->where('code', $code)
+            ->whereNull('removed_at')
+            ->first();
 
-        return response()->streamDownload(function () {
-            // Open output stream
-            $handle = fopen('php://output', 'w');
+        if (!$certificate || !$certificate->edition) {
+            return response()->json(['found' => false], 404);
+        }
 
-//            // Add CSV headers
-//            fputcsv($handle, [
-//                'id',
-//                'name',
-//                'email'
-//            ]);
-//
-//            // Get all users
-//            foreach (User::all() as $user) {
-//                // Add a new row with data
-//                fputcsv($handle, [
-//                    $user->id,
-//                    $user->name,
-//                    $user->email
-//                ]);
-//            }
+        $edition = $certificate->edition;
+        $certificateOptions = $edition->options->certificate ?? null;
+        $editionDir = config('certificates.uploads.edition');
+        $editionId = $edition->id;
+        $name = $certificate->name;
+        $codeVerificationUrl = 'https://certified.flisol.app/' . $certificate->code;
 
-            // Close the output stream
-            fclose($handle);
-        }, 200, [
+        $font = implode(DIRECTORY_SEPARATOR, [$editionDir, $editionId, $certificateOptions->font ?? 'NunitoSans-Bold.ttf']);
+        ini_set('memory_limit', '-1');
+        set_time_limit(0);
+
+        $certificateFile = null;
+        $colorHex = '#FE8200'; // default fallback color
+
+        if ($certificate->organizer && isset($certificateOptions->organizer)) {
+            $certificateFile = implode(DIRECTORY_SEPARATOR, [$editionDir, $editionId,
+                $certificateOptions->organizer->file]);
+            $colorHex = $certificateOptions->organizer->color;
+        } elseif ($certificate->collaborator && isset($certificateOptions->collaborator)) {
+            $certificateFile = implode(DIRECTORY_SEPARATOR, [$editionDir, $editionId,
+                $certificateOptions->collaborator->file]);
+            $colorHex = $certificateOptions->collaborator->color;
+        } elseif ($certificate->talk && isset($certificateOptions->speaker)) {
+            $isNameOnly = $certificate->name_only ?? false;
+            $opt = $isNameOnly ? ($certificateOptions->speaker_name_only ?? null) : $certificateOptions->speaker;
+
+            if ($opt) {
+                $certificateFile = implode(DIRECTORY_SEPARATOR, [$editionDir, $editionId,
+                    $certificateOptions->speaker->file]);
+                $colorHex = $certificateOptions->speaker->color;
+            }
+        } elseif ($certificate->participant && isset($certificateOptions->participant)) {
+            $certificateFile = implode(DIRECTORY_SEPARATOR, [$editionDir, $editionId,
+                $certificateOptions->participant->file]);
+            $colorHex = $certificateOptions->participant->color;
+        }
+
+        if (!$certificateFile || !file_exists($certificateFile)) {
+            return response()->json(['found' => false], 404);
+        }
+
+        $image = @imagecreatefrompng($certificateFile);
+
+        // Draw shadow
+        $shadow = imagecolorallocate($image, 240, 240, 240);
+        imagefttext($image, 60, 0, 109, 471, $shadow, $font, $name);
+
+        // Draw name
+        $rgb = $this->colorHelper->hexToRgb($colorHex);
+        $nameColor = imagecolorallocate($image, $rgb->red, $rgb->green, $rgb->blue);
+        imagefttext($image, 60, 0, 108, 470, $nameColor, $font, $name);
+
+        // Talk title if applicable
+        if ($certificate->talk && !$certificate->name_only) {
+            $title = $certificate->talk->title;
+            $titleColor = imagecolorallocate($image, 74, 79, 82);
+            imagefttext($image, 18, 0, 114, 570, $titleColor, $font, $title);
+        }
+
+        // Extra elements
+        if ($certificate->federal_code) {
+            $this->certificateHelper->addFederalCode($image, 'CPF', $certificate->federal_code, 12, 23);
+        }
+
+        $this->certificateHelper->addCodeVerificationUrl($image, $codeVerificationUrl, 1586, 0);
+        $this->certificateHelper->addQrCode($image, $codeVerificationUrl, 1280, 780);
+
+        $data = $this->certificateHelper->getData($image);
+
+        // Update last view
+        $certificate->last_view_at = DateTimeImmutable::createFromMutable(new DateTime());
+        $certificate->save();
+
+        return Response::streamDownload(function () use ($data) {
+            echo $data;
+        }, 'certificate_' . $certificate->code . '.png', [
             'Content-Type' => 'image/png',
-            'Content-Disposition' => 'attachment; filename="certificate_' . $code . '.png"',
         ]);
     }
 }

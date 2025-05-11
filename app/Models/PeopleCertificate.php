@@ -22,4 +22,24 @@ class PeopleCertificate extends Model
         return $this->belongsTo(Edition::class, 'edition_id');
     }
 
+    public function organizer()
+    {
+        return $this->belongsTo(Organizer::class, 'organizer_id');
+    }
+
+    public function collaborator()
+    {
+        return $this->belongsTo(Collaborator::class, 'collaborator_id');
+    }
+
+    public function talk()
+    {
+        return $this->belongsTo(Talk::class, 'talk_id');
+    }
+
+    public function participant()
+    {
+        return $this->belongsTo(Participant::class, 'participant_id');
+    }
+
 }
