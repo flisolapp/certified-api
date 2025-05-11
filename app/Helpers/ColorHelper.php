@@ -19,7 +19,7 @@ class ColorHelper
      * @param string $hex
      * @return object|bool
      */
-    function hexToRgb(string $hex): object|bool
+    public static function hexToRgb(string $hex): object|bool
     {
         // Remove the hash (#) if it's present
         $hex = str_replace("#", "", $hex);
@@ -40,7 +40,7 @@ class ColorHelper
 
     // Example usage
     // echo rgbToHex(254, 130, 0);  // Outputs: #fe8200
-    function rgbToHex(int $red, int $green, int $blue): string
+    public static function rgbToHex(int $red, int $green, int $blue): string
     {
         // Ensure the RGB values are within the 0-255 range
         $red = max(0, min(255, $red));

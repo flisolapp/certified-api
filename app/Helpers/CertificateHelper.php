@@ -28,9 +28,8 @@ class CertificateHelper
      * @param int $y The Y-coordinate for the text placement.
      * @return void
      */
-    public function addFederalCode(GdImage $image, string $federalCodeName, string $federalCode, int $x, int $y): void
+    public static function addFederalCode(GdImage $image, string $federalCodeName, string $federalCode, int $x, int $y): void
     {
-        // $font = implode(DIRECTORY_SEPARATOR, [__DIR__, '..', '..', 'resources', 'fonts', 'SpaceMono-Regular.ttf']);
         $font = resource_path('fonts/SpaceMono-Regular.ttf');
         $text = $federalCodeName . ': ' . $federalCode;
 
@@ -53,9 +52,8 @@ class CertificateHelper
      * @param int $y The Y-coordinate for the URL placement.
      * @return void
      */
-    public function addCodeVerificationUrl(GdImage $image, string $value, int $x, int $y): void
+    public static function addCodeVerificationUrl(GdImage $image, string $value, int $x, int $y): void
     {
-        // $font = implode(DIRECTORY_SEPARATOR, [__DIR__, '..', '..', 'resources', 'fonts', 'SpaceMono-Regular.ttf']);
         $font = resource_path('fonts/SpaceMono-Regular.ttf');
         $text = 'Verify at: ' . $value;
 
@@ -157,14 +155,16 @@ class CertificateHelper
             // you can optionally supply a password to make it harder
             // to calculate the corresponding numeric ID
 
-            for ($n = 0; $n < strlen($index); $n++) //
+            for ($n = 0; $n < strlen($index); $n++) {
                 $i[] = substr($index, $n, 1);
+            }
 
             $pass_hash = hash('sha256', $pass_key);
             $pass_hash = (strlen($pass_hash) < strlen($index) ? hash('sha512', $pass_key) : $pass_hash);
 
-            for ($n = 0; $n < strlen($index); $n++) //
+            for ($n = 0; $n < strlen($index); $n++) {
                 $p[] = substr($pass_hash, $n, 1);
+            }
 
             array_multisort($p, SORT_DESC, $i);
             $index = implode($i);
@@ -182,16 +182,18 @@ class CertificateHelper
             if (is_numeric($pad_up)) {
                 $pad_up--;
 
-                if ($pad_up > 0) //
+                if ($pad_up > 0) {
                     $out -= pow($base, $pad_up);
+                }
             }
         } else {
             // Digital number  -->>  alphabet letter code
             if (is_numeric($pad_up)) {
                 $pad_up--;
 
-                if ($pad_up > 0) //
+                if ($pad_up > 0) {
                     $in += pow($base, $pad_up);
+                }
             }
 
             for ($t = ($in != 0 ? floor(log($in, $base)) : 0); $t >= 0; $t--) {
@@ -229,10 +231,11 @@ class CertificateHelper
      * @param string $value The value to encode into the QR code.
      * @return QrCodeImage|null The QR code image or null if the value is null.
      */
-    private function generateQrCode($value): ?QrCodeImage
+    private static function generateQrCode($value): ?QrCodeImage
     {
-        if (is_null($value)) //
+        if (is_null($value)) {
             return null;
+        }
 
         $options = new QROptions([
             'version' => 10,
@@ -268,12 +271,12 @@ class CertificateHelper
      * @param int $y The Y-coordinate for the QR code placement.
      * @return void
      */
-    public function addQrCode(GdImage $image, string $value, int $x, int $y): void
+    public static function addQrCode(GdImage $image, string $value, int $x, int $y): void
     {
         $color = imagecolorallocatealpha($image, 255, 255, 255, 50);
         imagefilledrectangle($image, $x + 13, $y + 13, $x + 311, $y + 311, $color);
 
-        $qrCodeImage = $this->generateQrCode($value);
+        $qrCodeImage = self::generateQrCode($value);
 
         imagecopymerge($image, $qrCodeImage->getImage(), $x, $y, 0, 0, $qrCodeImage->getWidth(), //
             $qrCodeImage->getHeight(), 100);
@@ -285,7 +288,7 @@ class CertificateHelper
      * @param GdImage $image The image resource to convert.
      * @return string|false The image data as a string or false on failure.
      */
-    public function getData(GdImage $image): string|false
+    public static function getData(GdImage $image): string|false
     {
         ob_start();
 
