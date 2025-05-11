@@ -6,10 +6,10 @@ use Illuminate\Database\Eloquent\Model;
 
 class CollaboratorAvailability extends Model
 {
-    protected $table = 'collaborator_availability';
+    // protected $table = 'collaborator_availability';
 
     protected $fillable = [
-        'name'
+        'collaborator_id', 'collaborator_shift_id', 'created_at', 'updated_at', 'removed_at'
     ];
 
 }

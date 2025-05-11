@@ -4,9 +4,9 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 
-class StudentInfo extends Model
+class CollaboratorShift extends Model
 {
-    // protected $table = 'student_info';
+    // protected $table = 'collaborator_shift';
 
     protected $fillable = [
         'name'

@@ -6,7 +6,7 @@ use Illuminate\Database\Eloquent\Model;
 
 class TalkSubject extends Model
 {
-    protected $table = 'talk_subject';
+    // protected $table = 'talk_subject';
 
     protected $fillable = [
         'name'

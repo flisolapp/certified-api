@@ -8,7 +8,7 @@ return new class extends Migration
 {
     public function up(): void
     {
-        Schema::create('person_certificate', function (Blueprint $table) {
+        Schema::create('person_certificates', function (Blueprint $table) {
             $table->id();
             $table->unsignedBigInteger('person_id');
             $table->unsignedBigInteger('edition_id');
@@ -17,19 +17,19 @@ return new class extends Migration
             $table->unsignedBigInteger('talk_id');
             $table->unsignedBigInteger('participant_id');
             $table->string('name');
-            $table->string('federal_code');
+            $table->string('federal_code')->nullable();;
             $table->string('code');
-            $table->unsignedBigInteger('name_only');
-            $table->date('sent_at');
-            $table->date('last_view_at');
-            $table->date('created_at');
-            $table->date('updated_at');
-            $table->date('removed_at');
+            $table->boolean('name_only');
+            $table->dateTime('sent_at')->nullable();;
+            $table->dateTime('last_view_at')->nullable();;
+            $table->dateTime('created_at');
+            $table->dateTime('updated_at');
+            $table->dateTime('removed_at')->nullable();;
         });
     }
 
     public function down(): void
     {
-        Schema::dropIfExists('person_certificate');
+        Schema::dropIfExists('person_certificates');
     }
 };

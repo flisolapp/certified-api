@@ -8,18 +8,18 @@ return new class extends Migration
 {
     public function up(): void
     {
-        Schema::create('collaborator_area', function (Blueprint $table) {
+        Schema::create('collaborator_areas', function (Blueprint $table) {
             $table->id();
             $table->unsignedBigInteger('collaborator_id');
             $table->unsignedBigInteger('collaboration_area_id');
-            $table->date('created_at');
-            $table->date('updated_at');
-            $table->date('removed_at');
+            $table->dateTime('created_at');
+            $table->dateTime('updated_at');
+            $table->dateTime('removed_at')->nullable();
         });
     }
 
     public function down(): void
     {
-        Schema::dropIfExists('collaborator_area');
+        Schema::dropIfExists('collaborator_areas');
     }
 };

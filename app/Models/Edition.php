@@ -3,10 +3,11 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use Throwable;
 
 class Edition extends Model
 {
-    protected $table = 'edition';
+    // protected $table = 'edition';
 
     protected $fillable = [
         'year', 'options', 'active', 'created_at', 'updated_at', 'removed_at'
@@ -21,7 +22,7 @@ class Edition extends Model
         try {
             $decoded = json_decode($value);
             return json_last_error() === JSON_ERROR_NONE ? $decoded : null;
-        } catch (\Throwable $e) {
+        } catch (Throwable $e) {
             return null;
         }
     }

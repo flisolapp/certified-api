@@ -6,7 +6,7 @@ use Illuminate\Database\Eloquent\Model;
 
 class SpeakerTalk extends Model
 {
-    protected $table = 'speaker_talk';
+    // protected $table = 'speaker_talk';
 
     protected $fillable = [
         'speaker_id', 'talk_id', 'created_at', 'updated_at', 'removed_at'

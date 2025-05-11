@@ -8,19 +8,19 @@ return new class extends Migration
 {
     public function up(): void
     {
-        Schema::create('edition', function (Blueprint $table) {
+        Schema::create('editions', function (Blueprint $table) {
             $table->id();
             $table->string('year');  // original type: char(4)
-            $table->string('options');
+            $table->json('options')->nullable();
             $table->unsignedBigInteger('active');
-            $table->date('created_at');
-            $table->date('updated_at');
-            $table->date('removed_at');
+            $table->dateTime('created_at');
+            $table->dateTime('updated_at');
+            $table->dateTime('removed_at')->nullable();
         });
     }
 
     public function down(): void
     {
-        Schema::dropIfExists('edition');
+        Schema::dropIfExists('editions');
     }
 };
