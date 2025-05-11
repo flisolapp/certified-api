@@ -106,12 +106,12 @@ class CertificatesDownloadController extends Controller
 
         if ($certificate->talk && isset($certificateOptions->speaker)) {
             $isNameOnly = $certificate->name_only ?? false;
-            $opt = $isNameOnly ? ($certificateOptions->speaker_name_only ?? null) : $certificateOptions->speaker;
+            $options = $isNameOnly ? ($certificateOptions->speaker_name_only ?? null) : $certificateOptions->speaker;
 
-            if ($opt) {
+            if ($options) {
                 return [
-                    implode(DIRECTORY_SEPARATOR, [$editionDir, $editionId, $certificateOptions->speaker->file]),
-                    $certificateOptions->speaker->color
+                    implode(DIRECTORY_SEPARATOR, [$editionDir, $editionId, $options->file]),
+                    $options->color
                 ];
             }
         }
