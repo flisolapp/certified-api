@@ -9,7 +9,7 @@ class Collaborator extends Model
     // protected $table = 'collaborator';
 
     protected $fillable = [
-        'edition_id', 'people_id', 'audited_at', 'audit_note', 'approved', 'confirmed_at', 'created_at', 'updated_at', 'removed_at'
+        'edition_id', 'people_id', 'audited_at', 'audit_note', 'approved_at', 'confirmed_at', 'created_at', 'updated_at', 'removed_at'
     ];
 
     public function person()

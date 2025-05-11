@@ -13,7 +13,7 @@ return new class extends Migration {
             $table->unsignedBigInteger('people_id');
             $table->timestamp('audited_at')->nullable();
             $table->string('audit_note')->nullable();
-            $table->unsignedBigInteger('approved')->nullable();
+            $table->timestamp('approved_at')->nullable();
             $table->timestamp('confirmed_at')->nullable();
             $table->timestamp('created_at');
             $table->timestamp('updated_at');

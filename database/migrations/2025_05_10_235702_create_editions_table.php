@@ -11,7 +11,7 @@ return new class extends Migration {
             $table->id();
             $table->string('year');  // original type: char(4)
             $table->json('options')->nullable();
-            $table->unsignedBigInteger('active');
+            $table->boolean('active');
             $table->timestamp('created_at');
             $table->timestamp('updated_at');
             $table->timestamp('removed_at')->nullable();

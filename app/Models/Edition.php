@@ -15,6 +15,7 @@ class Edition extends Model
 
     protected $casts = [
         'options' => 'array',
+        'active' => 'boolean',
     ];
 
     public function getOptionsAttribute($value)
