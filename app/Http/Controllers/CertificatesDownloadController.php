@@ -43,14 +43,35 @@ class CertificatesDownloadController extends Controller
 
         $image = @imagecreatefrompng($certificateFile);
 
-        // Draw shadow
-        $shadow = imagecolorallocate($image, 240, 240, 240);
-        imagefttext($image, 60, 0, 109, 471, $shadow, $font, $name);
+        if ($name) {
+            // Draw shadow
+            // $shadow = imagecolorallocate($image, 240, 240, 240);
+            // imagefttext($image, 60, 0, 109, 471, $shadow, $font, $name);
+            [$firstLine, $secondLine] = $this->splitTextBySpace($name, 23);
 
-        // Draw name
-        $rgb = ColorHelper::hexToRgb($colorHex);
-        $nameColor = imagecolorallocate($image, $rgb->red, $rgb->green, $rgb->blue);
-        imagefttext($image, 60, 0, 108, 470, $nameColor, $font, $name);
+            // Draw shadow for the first line
+            $shadow = imagecolorallocate($image, 240, 240, 240);
+            imagefttext($image, 60, 0, 109, 471, $shadow, $font, $firstLine);
+
+            // Draw shadow for the second line, if it exists
+            if ($secondLine) {
+                imagefttext($image, 60, 0, 109, 551, $shadow, $font, $secondLine);
+            }
+
+            // Draw name
+            $rgb = ColorHelper::hexToRgb($colorHex);
+            $nameColor = imagecolorallocate($image, $rgb->red, $rgb->green, $rgb->blue);
+            // imagefttext($image, 60, 0, 108, 470, $nameColor, $font, $name);
+            [$firstLine, $secondLine] = $this->splitTextBySpace($name, 23);
+
+            // Draw the first line
+            imagefttext($image, 60, 0, 108, 470, $nameColor, $font, $firstLine);
+
+            // Draw the second line, if it exists
+            if ($secondLine) {
+                imagefttext($image, 60, 0, 108, 550, $nameColor, $font, $secondLine);
+            }
+        }
 
         // Talk title if applicable
         if ($certificate->talk && !$certificate->name_only) {
@@ -124,5 +145,27 @@ class CertificatesDownloadController extends Controller
         }
 
         return [null, $defaultColor];
+    }
+
+    private function splitTextBySpace(string $text, int $near): array
+    {
+        if (mb_strlen($text) <= $near) {
+            return [$text, null];
+        }
+
+        // Find space before or after the target length
+        $before = mb_strrpos(mb_substr($text, 0, $near + 1), ' ');
+        $after = mb_strpos($text, ' ', $near);
+
+        if ($before === false && $after === false) {
+            return [$text, null];
+        }
+
+        $splitPos = $before !== false ? $before : $after;
+
+        $firstLine = trim(mb_substr($text, 0, $splitPos));
+        $secondLine = trim(mb_substr($text, $splitPos));
+
+        return [$firstLine, $secondLine];
     }
 }
