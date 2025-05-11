@@ -2,25 +2,14 @@
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class TalkSubject extends Model
 {
-    use HasFactory;
+    protected $table = 'talk_subject';
 
-    /**
-     * The table associated with the model.
-     *
-     * @var string
-     */
-    protected $table = 'talk_subjects';
+    protected $fillable = [
+        'name'
+    ];
 
-    public $timestamps = false;
-
-    public function translates(): HasMany
-    {
-        return $this->hasMany(TalkSubjectI18n::class);
-    }
 }

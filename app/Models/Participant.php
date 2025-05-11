@@ -2,33 +2,19 @@
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class Participant extends Model
 {
-    use HasFactory;
+    protected $table = 'participant';
 
-    /**
-     * The table associated with the model.
-     *
-     * @var string
-     */
-    protected $table = 'participants';
+    protected $fillable = [
+        'edition_id', 'person_id', 'presented_at', 'prizedraw_confirmation_at', 'prizedraw_winner_at', 'prizedraw_order', 'prizedraw_description', 'created_at', 'updated_at', 'removed_at'
+    ];
 
-    public function edition(): BelongsTo
+    public function person()
     {
-        return $this->belongsTo(Edition::class);
+        return $this->belongsTo(Person::class, 'person_id');
     }
 
-    public function unit(): BelongsTo
-    {
-        return $this->belongsTo(Unit::class);
-    }
-
-    public function person(): BelongsTo
-    {
-        return $this->belongsTo(Person::class);
-    }
 }

@@ -2,28 +2,14 @@
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class CollaboratorArea extends Model
 {
-    use HasFactory;
+    protected $table = 'collaborator_area';
 
-    /**
-     * The table associated with the model.
-     *
-     * @var string
-     */
-    protected $table = 'collaborators_areas';
+    protected $fillable = [
+        'collaborator_id', 'collaboration_area_id', 'created_at', 'updated_at', 'removed_at'
+    ];
 
-    public function collaborator(): BelongsTo
-    {
-        return $this->belongsTo(Collaborator::class);
-    }
-
-    public function area(): BelongsTo
-    {
-        return $this->belongsTo(CollaborationArea::class);
-    }
 }

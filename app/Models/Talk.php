@@ -2,49 +2,19 @@
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\Relations\BelongsTo;
-use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class Talk extends Model
 {
-    use HasFactory;
+    protected $table = 'talk';
 
-    /**
-     * The table associated with the model.
-     *
-     * @var string
-     */
-    protected $table = 'talks';
+    protected $fillable = [
+        'edition_id', 'title', 'description', 'shift', 'kind', 'talk_subject_id', 'slide_file', 'slide_url', 'internal_note', 'audited_at', 'audit_note', 'approved', 'confirmed_at', 'created_at', 'updated_at', 'removed_at'
+    ];
 
-    public function edition(): BelongsTo
+    public function speakerTalks()
     {
-        return $this->belongsTo(Edition::class);
+        return $this->hasMany(SpeakerTalk::class, 'talk_id');
     }
 
-    public function unit(): BelongsTo
-    {
-        return $this->belongsTo(Unit::class);
-    }
-
-    public function subject(): BelongsTo
-    {
-        return $this->belongsTo(TalkSubject::class);
-    }
-
-    public function shift(): BelongsTo
-    {
-        return $this->belongsTo(TalkShift::class);
-    }
-
-    public function kind(): BelongsTo
-    {
-        return $this->belongsTo(TalkKind::class);
-    }
-
-    public function speakers(): HasMany
-    {
-        return $this->hasMany(Speaker::class);
-    }
 }

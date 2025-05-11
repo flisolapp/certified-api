@@ -2,54 +2,14 @@
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\Relations\BelongsTo;
-use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class Person extends Model
 {
-    use HasFactory;
+    protected $table = 'person';
 
-    /**
-     * The table associated with the model.
-     *
-     * @var string
-     */
-    protected $table = 'persons';
+    protected $fillable = [
+        'name', 'federal_code', 'email', 'phone', 'photo', 'bio', 'site', 'use_free', 'distro_id', 'student_info_id', 'student_place', 'student_course', 'address_state', 'created_at', 'updated_at', 'removed_at'
+    ];
 
-    public function children(): HasMany
-    {
-        return $this->hasMany(Person::class);
-    }
-
-    public function parent(): BelongsTo
-    {
-        return $this->belongsTo(Person::class);
-    }
-
-    public function addressCityById(): BelongsTo
-    {
-        return $this->belongsTo(City::class);
-    }
-
-    public function addressStateById(): BelongsTo
-    {
-        return $this->belongsTo(State::class);
-    }
-
-    public function addressCountryById(): BelongsTo
-    {
-        return $this->belongsTo(Country::class);
-    }
-
-    public function organizers(): HasMany
-    {
-        return $this->hasMany(Organizer::class);
-    }
-
-    public function collaborators(): HasMany
-    {
-        return $this->hasMany(Collaborator::class);
-    }
 }

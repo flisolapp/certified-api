@@ -2,28 +2,14 @@
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class CollaboratorAvailability extends Model
 {
-    use HasFactory;
+    protected $table = 'collaborator_availability';
 
-    /**
-     * The table associated with the model.
-     *
-     * @var string
-     */
-    protected $table = 'collaborators_areas';
+    protected $fillable = [
+        'name'
+    ];
 
-    public function collaborator(): BelongsTo
-    {
-        return $this->belongsTo(Collaborator::class);
-    }
-
-    public function availability(): BelongsTo
-    {
-        return $this->belongsTo(CollaborationAvailability::class);
-    }
 }

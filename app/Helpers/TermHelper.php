@@ -48,7 +48,7 @@ class TermHelper
 
         // Trimming the term and extracting the last segment after the last '/' character.
         // Useful for processing terms that might be part of a URL or path.
-        $processedTerm = trim(substr($term, strrpos($term, '/') + 1));
+        $processedTerm = str_contains($term, '/') ? trim(substr($term, strrpos($term, '/') + 1)) : trim($term);
 
         // Additional check to ensure the processed term is not an empty string.
         if ($processedTerm === '') {

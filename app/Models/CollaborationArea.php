@@ -2,25 +2,14 @@
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class CollaborationArea extends Model
 {
-    use HasFactory;
+    protected $table = 'collaboration_area';
 
-    /**
-     * The table associated with the model.
-     *
-     * @var string
-     */
-    protected $table = 'collaboration_areas';
+    protected $fillable = [
+        'name'
+    ];
 
-    public $timestamps = false;
-
-    public function translates(): HasMany
-    {
-        return $this->hasMany(CollaborationAreaI18n::class);
-    }
 }

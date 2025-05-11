@@ -2,33 +2,19 @@
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class Organizer extends Model
 {
-    use HasFactory;
+    protected $table = 'organizer';
 
-    /**
-     * The table associated with the model.
-     *
-     * @var string
-     */
-    protected $table = 'organizers';
+    protected $fillable = [
+        'edition_id', 'person_id', 'created_at', 'updated_at', 'removed_at'
+    ];
 
-    public function edition(): BelongsTo
+    public function person()
     {
-        return $this->belongsTo(Edition::class);
+        return $this->belongsTo(Person::class, 'person_id');
     }
 
-    public function unit(): BelongsTo
-    {
-        return $this->belongsTo(Unit::class);
-    }
-
-    public function person(): BelongsTo
-    {
-        return $this->belongsTo(Person::class);
-    }
 }
