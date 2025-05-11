@@ -12,13 +12,13 @@ return new class extends Migration
             $table->id();
             $table->unsignedBigInteger('person_id');
             $table->unsignedBigInteger('edition_id');
-            $table->unsignedBigInteger('organizer_id');
-            $table->unsignedBigInteger('collaborator_id');
-            $table->unsignedBigInteger('talk_id');
-            $table->unsignedBigInteger('participant_id');
+            $table->unsignedBigInteger('organizer_id')->nullable();;
+            $table->unsignedBigInteger('collaborator_id')->nullable();;
+            $table->unsignedBigInteger('talk_id')->nullable();;
+            $table->unsignedBigInteger('participant_id')->nullable();;
             $table->string('name');
             $table->string('federal_code')->nullable();;
-            $table->string('code');
+            $table->string('code')->nullable();;
             $table->boolean('name_only');
             $table->dateTime('sent_at')->nullable();;
             $table->dateTime('last_view_at')->nullable();;

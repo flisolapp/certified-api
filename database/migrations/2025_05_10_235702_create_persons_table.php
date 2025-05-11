@@ -14,8 +14,8 @@ return new class extends Migration
             $table->string('federal_code')->nullable();;
             $table->string('email');
             $table->string('phone');
-            $table->string('photo')->nullable();;
-            $table->string('bio')->nullable();;
+            $table->text('photo')->nullable();;
+            $table->text('bio')->nullable();;
             $table->string('site')->nullable();;
             $table->boolean('use_free');
             $table->unsignedBigInteger('distro_id')->nullable();;
