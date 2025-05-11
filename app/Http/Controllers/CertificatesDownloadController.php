@@ -14,7 +14,7 @@ class CertificatesDownloadController extends Controller
         //        // Resolve code in this scope
         //        $code = $route->getArgument('code');
         //
-        //        $repository = $this->em->getRepository(PersonCertificate::class);
+        //        $repository = $this->em->getRepository(PeopleCertificate::class);
         //        $qb = $repository->createQueryBuilder('pc')
         //            ->select('pc')
         //            ->where('pc.code = :certificateCode')
@@ -23,7 +23,7 @@ class CertificatesDownloadController extends Controller
         //            ->setMaxResults(1);
         //        $q = $qb->getQuery();
         //
-        //        /** @var PersonCertificate[] $items */
+        //        /** @var PeopleCertificate[] $items */
         //        $items = $q->execute();
         //
         //        $current = null;

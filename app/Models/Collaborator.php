@@ -9,12 +9,12 @@ class Collaborator extends Model
     // protected $table = 'collaborator';
 
     protected $fillable = [
-        'edition_id', 'person_id', 'audited_at', 'audit_note', 'approved', 'confirmed_at', 'created_at', 'updated_at', 'removed_at'
+        'edition_id', 'people_id', 'audited_at', 'audit_note', 'approved', 'confirmed_at', 'created_at', 'updated_at', 'removed_at'
     ];
 
     public function person()
     {
-        return $this->belongsTo(Person::class, 'person_id');
+        return $this->belongsTo(People::class, 'people_id');
     }
 
 }

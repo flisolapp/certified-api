@@ -14,7 +14,7 @@ class SpeakerTalk extends Model
 
     public function person()
     {
-        return $this->belongsTo(Person::class, 'speaker_id');
+        return $this->belongsTo(People::class, 'speaker_id');
     }
 
     public function talk()

@@ -3,8 +3,7 @@
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Support\Facades\DB;
 
-return new class extends Migration
-{
+return new class extends Migration {
     public function up(): void
     {
         DB::statement("
@@ -28,7 +27,7 @@ return new class extends Migration
                     WHERE ca1.collaborator_id = c.id
                 ) AS availabilities
             FROM collaborators c
-            JOIN persons p ON p.id = c.person_id
+            JOIN people p ON p.id = c.people_id
             JOIN editions e ON e.id = c.edition_id
             ORDER BY e.year DESC, p.name ASC
         ");

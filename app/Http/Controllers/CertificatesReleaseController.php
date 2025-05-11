@@ -2,11 +2,13 @@
 
 namespace App\Http\Controllers;
 
+use App\Helpers\CertificateHelper;
+use App\Helpers\StringHelper;
 use App\Models\Collaborator;
 use App\Models\Edition;
 use App\Models\Organizer;
 use App\Models\Participant;
-use App\Models\PersonCertificate;
+use App\Models\PeopleCertificate;
 use App\Models\Talk;
 use Carbon\Carbon;
 use Exception;
@@ -33,16 +35,16 @@ class CertificatesReleaseController extends Controller
                 ->with('person')
                 ->get()
                 ->each(function ($organizer) use ($edition, $now) {
-                    if (!PersonCertificate::where([
-                        ['person_id', $organizer->person_id],
+                    if (!PeopleCertificate::where([
+                        ['people_id', $organizer->people_id],
                         ['edition_id', $edition->id],
                         ['organizer_id', $organizer->id],
                         ['collaborator_id', null],
                         ['talk_id', null],
                         ['participant_id', null],
                     ])->exists()) {
-                        PersonCertificate::create([
-                            'person_id' => $organizer->person_id,
+                        PeopleCertificate::create([
+                            'people_id' => $organizer->people_id,
                             'edition_id' => $edition->id,
                             'organizer_id' => $organizer->id,
                             'name' => $organizer->person->name,
@@ -59,16 +61,16 @@ class CertificatesReleaseController extends Controller
                 ->with('person')
                 ->get()
                 ->each(function ($collaborator) use ($edition, $now) {
-                    if (!PersonCertificate::where([
-                        ['person_id', $collaborator->person_id],
+                    if (!PeopleCertificate::where([
+                        ['people_id', $collaborator->people_id],
                         ['edition_id', $edition->id],
                         ['organizer_id', null],
                         ['collaborator_id', $collaborator->id],
                         ['talk_id', null],
                         ['participant_id', null],
                     ])->exists()) {
-                        PersonCertificate::create([
-                            'person_id' => $collaborator->person_id,
+                        PeopleCertificate::create([
+                            'people_id' => $collaborator->people_id,
                             'edition_id' => $edition->id,
                             'collaborator_id' => $collaborator->id,
                             'name' => $collaborator->person->name,
@@ -86,16 +88,16 @@ class CertificatesReleaseController extends Controller
                 ->get()
                 ->each(function ($talk) use ($edition, $now) {
                     foreach ($talk->speakerTalks as $st) {
-                        if (!PersonCertificate::where([
-                            ['person_id', $st->speaker_id],
+                        if (!PeopleCertificate::where([
+                            ['people_id', $st->speaker_id],
                             ['edition_id', $edition->id],
                             ['organizer_id', null],
                             ['collaborator_id', null],
                             ['talk_id', $talk->id],
                             ['participant_id', null],
                         ])->exists()) {
-                            PersonCertificate::create([
-                                'person_id' => $st->speaker_id,
+                            PeopleCertificate::create([
+                                'people_id' => $st->speaker_id,
                                 'edition_id' => $edition->id,
                                 'talk_id' => $talk->id,
                                 'name' => $st->person->name,
@@ -113,16 +115,16 @@ class CertificatesReleaseController extends Controller
                 ->with('person')
                 ->get()
                 ->each(function ($participant) use ($edition, $now) {
-                    if (!PersonCertificate::where([
-                        ['person_id', $participant->person_id],
+                    if (!PeopleCertificate::where([
+                        ['people_id', $participant->people_id],
                         ['edition_id', $edition->id],
                         ['organizer_id', null],
                         ['collaborator_id', null],
                         ['talk_id', null],
                         ['participant_id', $participant->id],
                     ])->exists()) {
-                        PersonCertificate::create([
-                            'person_id' => $participant->person_id,
+                        PeopleCertificate::create([
+                            'people_id' => $participant->people_id,
                             'edition_id' => $edition->id,
                             'participant_id' => $participant->id,
                             'name' => $participant->person->name,
@@ -134,11 +136,34 @@ class CertificatesReleaseController extends Controller
                 });
 
             DB::commit();
+
+            // Generate unique codes and fix names for certificates without codes
+            $certificates = PeopleCertificate::where('edition_id', $edition->id)
+                ->whereNull('removed_at')
+                ->whereNull('code')
+                ->get();
+
+            foreach ($certificates as $certificate) {
+                $certificate->name = StringHelper::prepareName($certificate->name);
+                $certificate->code = $this->generateUniqueCode();
+                $certificate->updated_at = $now;
+                $certificate->save();
+            }
+
             return response()->json(['message' => 'Person certificates released successfully.']);
         } catch (Exception $e) {
             DB::rollBack();
             Log::error('Error populating person certificates: ' . $e->getMessage());
             return response()->json(['error' => 'Failed to populate certificates.'], 500);
         }
+    }
+
+    private function generateUniqueCode(): string
+    {
+        do {
+            $code = CertificateHelper::generateCode();
+        } while (PeopleCertificate::where('code', $code)->exists());
+
+        return $code;
     }
 }

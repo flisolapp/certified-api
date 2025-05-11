@@ -3,8 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Helpers\TermHelper;
-use App\Models\Edition;
-use App\Models\PersonCertificate;
+use App\Models\PeopleCertificate;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\Log;
 use InvalidArgumentException;
@@ -23,7 +22,7 @@ class CertificatesSearchController extends Controller
             ], 400);
         }
 
-        $items = PersonCertificate::with(['person', 'edition'])
+        $items = PeopleCertificate::with(['person', 'edition'])
             ->where(function ($query) use ($term) {
                 $query->where('code', $term)
                     ->orWhereHas('person', fn($q) => $q->where('email', $term));
@@ -34,7 +33,7 @@ class CertificatesSearchController extends Controller
             ->get();
 
         if ($items->isEmpty()) {
-            return response()->json([]);
+            return response()->json([], 404);
         }
 
         $list = $items->map(function ($item) {

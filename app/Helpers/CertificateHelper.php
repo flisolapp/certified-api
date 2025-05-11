@@ -144,7 +144,7 @@ class CertificateHelper
      * @param string $pass_key An optional password for added security. Supplying a password makes it harder to calculate the original ID.
      * @return mixed Translated string or number.
      */
-    private function alphaID($in, $to_num = false, $pad_up = false, $pass_key = null)
+    private static function alphaID($in, $to_num = false, $pad_up = false, $pass_key = null)
     {
         $out = '';
         $index = 'abcdefghijklmnopqrstuvwxyz0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ';
@@ -210,17 +210,17 @@ class CertificateHelper
      *
      * @return string The generated code.
      */
-    public function generateCode()
+    public static function generateCode(): string
     {
         $sid = uniqid();
-        $id = 0;
+        $id = collect(str_split($sid))
+            ->map(fn($char) => is_numeric($char) ? $char : ord(strtolower($char)) - 96)
+            ->implode('');
 
-        foreach (str_split($sid) as $char) //
-            $id .= (is_numeric($char)) ? $char : (ord(strtolower($char)) - 96);
+        $shuffled = str_shuffle($id);
+        $id = $shuffled . str_shuffle($shuffled);
 
-        $id = str_shuffle(str_shuffle($id)) . str_shuffle($id);
-
-        return $this->alphaID($id);
+        return self::alphaID($id);
     }
 
     /**

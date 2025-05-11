@@ -3,8 +3,7 @@
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Support\Facades\DB;
 
-return new class extends Migration
-{
+return new class extends Migration {
     public function up(): void
     {
         DB::statement("
@@ -23,14 +22,14 @@ return new class extends Migration
                     WHEN 'O' THEN 'Oficina'
                     ELSE 'Palestra'
                 END AS kind,
-                p.id AS person_id,
+                p.id AS people_id,
                 p.name,
                 p.email,
                 p.phone
             FROM talks t
             JOIN talk_subjects ts ON ts.id = t.talk_subject_id
             JOIN speaker_talks st ON st.talk_id = t.id
-            JOIN persons p ON p.id = st.speaker_id
+            JOIN people p ON p.id = st.speaker_id
             JOIN editions e ON e.id = t.edition_id
             WHERE t.id <> 35
               AND t.removed_at IS NULL
