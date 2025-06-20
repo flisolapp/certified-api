@@ -3,7 +3,6 @@
 namespace App\Http\Controllers;
 
 use App\Helpers\CertificateHelper;
-use App\Helpers\CertificateStorageCacheHelper;
 use App\Helpers\ColorHelper;
 use App\Helpers\StorageCacheHelper;
 use App\Models\PeopleCertificate;
@@ -45,12 +44,12 @@ class CertificatesDownloadController extends Controller
         $codeVerificationUrl = 'https://certified.flisol.app/' . $certificate->code;
 
         // Cache check
-        $cachedCertificate = CertificateStorageCacheHelper::getOrDownload($editionId, $code);
+        $cachedCertificate = StorageCacheHelper::get("certificates/{$editionId}/{$certificate->code}.png");
 
         if ($cachedCertificate && file_exists($cachedCertificate)) {
             return Response::streamDownload(function () use ($cachedCertificate) {
                 readfile($cachedCertificate);
-            }, 'certificate_' . $code . '.png', [
+            }, 'certificate_' . $certificate->code . '.png', [
                 'Content-Type' => 'image/png',
             ]);
         }
@@ -60,7 +59,7 @@ class CertificatesDownloadController extends Controller
         // Load and cache font from S3 (stored per edition)
         $fontFileName = $certificateOptions->font ?? 'NunitoSans-Bold.ttf';
         $fontKey = "editions/{$editionId}/{$fontFileName}";
-        $font = StorageCacheHelper::getFileFromS3($fontKey);
+        $font = StorageCacheHelper::get($fontKey);
 
         // Abort if font file was not found
         if (!$font || !file_exists($font)) {
@@ -125,8 +124,8 @@ class CertificatesDownloadController extends Controller
         $certificate->last_view_at = DateTimeImmutable::createFromMutable(new DateTime());
         $certificate->save();
 
-        // ==== Cache the generated certificate ====
-        CertificateStorageCacheHelper::save($editionId, $certificate->code, $data);
+        // Cache the generated certificate
+        StorageCacheHelper::save("certificates/{$editionId}/{$certificate->code}.png", $data);
 
         // Stream the image as a download response
         return Response::streamDownload(function () use ($data) {
@@ -173,7 +172,7 @@ class CertificatesDownloadController extends Controller
 
                 // Load template file from S3 and cache locally
                 $fileKey = "editions/{$editionId}/{$option->file}";
-                $file = StorageCacheHelper::getFileFromS3($fileKey);
+                $file = StorageCacheHelper::get($fileKey);
 
                 return [$file, $option->color];
             }

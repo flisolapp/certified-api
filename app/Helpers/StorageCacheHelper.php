@@ -4,6 +4,7 @@ namespace App\Helpers;
 
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Storage;
+use RuntimeException;
 use Throwable;
 
 class StorageCacheHelper
@@ -11,7 +12,7 @@ class StorageCacheHelper
 
     private static array $cache = [];
 
-    public static function getFileFromS3(string $key): ?string
+    public static function get(string $key): ?string
     {
         if (isset(self::$cache[$key])) {
             return self::$cache[$key];
@@ -36,6 +37,21 @@ class StorageCacheHelper
         self::$cache[$key] = $localDisk->path($key);
 
         return self::$cache[$key];
+    }
+
+    public static function save(string $key, string $binaryData): void
+    {
+        if ($binaryData === null) {
+            throw new RuntimeException("Cannot save null data for key: {$key}");
+        }
+
+        $diskS3 = Storage::disk('s3');
+        $diskLocal = Storage::disk('storage_cache');
+
+        $diskLocal->put($key, $binaryData);
+        $diskS3->put($key, $binaryData);
+
+        self::$cache[$key] = $diskLocal->path($key);
     }
 
 }
