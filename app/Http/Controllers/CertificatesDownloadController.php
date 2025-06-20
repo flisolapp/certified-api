@@ -4,7 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Helpers\CertificateHelper;
 use App\Helpers\ColorHelper;
-use App\Helpers\S3StorageCacheHelper;
+use App\Helpers\StorageCacheHelper;
 use App\Models\PeopleCertificate;
 use DateTime;
 use DateTimeImmutable;
@@ -46,7 +46,7 @@ class CertificatesDownloadController extends Controller
         // Load and cache font from S3 (stored per edition)
         $fontFileName = $certificateOptions->font ?? 'NunitoSans-Bold.ttf';
         $fontKey = "editions/{$editionId}/{$fontFileName}";
-        $font = S3StorageCacheHelper::getFile($fontKey);
+        $font = StorageCacheHelper::getFileFromS3($fontKey);
 
         // Abort if font file was not found
         if (!$font || !file_exists($font)) {
@@ -152,7 +152,7 @@ class CertificatesDownloadController extends Controller
 
                 // Load template file from S3 and cache locally
                 $fileKey = "editions/{$editionId}/{$option->file}";
-                $file = S3StorageCacheHelper::getFile($fileKey);
+                $file = StorageCacheHelper::getFileFromS3($fileKey);
 
                 return [$file, $option->color];
             }

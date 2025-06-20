@@ -4,12 +4,12 @@ namespace App\Helpers;
 
 use Illuminate\Support\Facades\Storage;
 
-class S3StorageCacheHelper
+class StorageCacheHelper
 {
 
     private static array $cache = [];
 
-    public static function getFile(string $key): ?string
+    public static function getFileFromS3(string $key): ?string
     {
         if (isset(self::$cache[$key])) {
             return self::$cache[$key];
