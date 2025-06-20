@@ -16,19 +16,17 @@ class StorageCacheHelper
         }
 
         $disk = Storage::disk('s3');
-        $localDisk = Storage::disk('local');
+        $localDisk = Storage::disk('storage_cache');
 
-        $localPath = "cache/{$key}";
-
-        if (!$localDisk->exists($localPath)) {
+        if (!$localDisk->exists($key)) {
             if (!Storage::disk('s3')->exists($key)) {
                 return null;
             }
 
-            $localDisk->put($localPath, $disk->get($key));
+            $localDisk->put($key, $disk->get($key));
         }
 
-        self::$cache[$key] = $localDisk->path($localPath);
+        self::$cache[$key] = $localDisk->path($key);
 
         return self::$cache[$key];
     }

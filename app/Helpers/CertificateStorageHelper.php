@@ -30,10 +30,10 @@ class CertificateStorageHelper
         }
 
         $diskS3 = Storage::disk('s3');
-        $diskLocal = Storage::disk('local');
+        $diskLocal = Storage::disk('storage_cache');
 
         $s3Key = "certificates/{$editionId}/{$code}.png";
-        $localPath = "cache/certificates/{$editionId}/{$code}.png";
+        $localPath = "certificates/{$editionId}/{$code}.png";
 
         // Check local cache
         if ($diskLocal->exists($localPath)) {
@@ -69,10 +69,10 @@ class CertificateStorageHelper
         }
 
         $diskS3 = Storage::disk('s3');
-        $diskLocal = Storage::disk('local');
+        $diskLocal = Storage::disk('storage_cache');
 
         $s3Key = "certificates/{$editionId}/{$code}.png";
-        $localPath = "cache/certificates/{$editionId}/{$code}.png";
+        $localPath = "certificates/{$editionId}/{$code}.png";
 
         $diskLocal->put($localPath, $binaryData);
         $diskS3->put($s3Key, $binaryData);
