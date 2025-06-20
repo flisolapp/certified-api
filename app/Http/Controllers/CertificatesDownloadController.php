@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Helpers\CertificateHelper;
+use App\Helpers\CertificateStorageHelper;
 use App\Helpers\ColorHelper;
 use App\Helpers\StorageCacheHelper;
 use App\Models\PeopleCertificate;
@@ -11,7 +12,6 @@ use DateTimeImmutable;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\Response;
 use Symfony\Component\HttpFoundation\StreamedResponse;
-use App\Helpers\CertificateStorageHelper;
 
 class CertificatesDownloadController extends Controller
 {

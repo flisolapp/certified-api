@@ -3,6 +3,8 @@
 namespace App\Helpers;
 
 use Illuminate\Support\Facades\Storage;
+use RuntimeException;
+use Throwable;
 
 class CertificateStorageHelper
 {
@@ -38,7 +40,7 @@ class CertificateStorageHelper
                 $diskLocal->put($localPath, $diskS3->get($s3Key));
                 self::$cache[$code] = $diskLocal->path($localPath);
                 return self::$cache[$code];
-            } catch (\Throwable $e) {
+            } catch (Throwable $e) {
                 // Importante: capture Throwable para pegar Error e Exception
                 // \Log::error("Failed to get S3 object '{$s3Key}': " . $e->getMessage());
             }
@@ -57,7 +59,7 @@ class CertificateStorageHelper
     public static function save(string $code, string $binaryData): void
     {
         if ($binaryData === null) {
-            throw new \RuntimeException("Cannot save null certificate data for code: {$code}");
+            throw new RuntimeException("Cannot save null certificate data for code: {$code}");
         }
 
         $diskS3 = Storage::disk('s3');
