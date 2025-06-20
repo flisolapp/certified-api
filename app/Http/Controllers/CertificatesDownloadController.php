@@ -11,6 +11,7 @@ use DateTimeImmutable;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\Response;
 use Symfony\Component\HttpFoundation\StreamedResponse;
+use App\Helpers\CertificateStorageHelper;
 
 class CertificatesDownloadController extends Controller
 {
@@ -36,6 +37,19 @@ class CertificatesDownloadController extends Controller
         if (!$certificate || !$certificate->edition) {
             return response()->json(['found' => false], 404);
         }
+
+        // Cache check
+        $cachedCertificate = CertificateStorageHelper::getOrDownload($code);
+
+        if ($cachedCertificate && file_exists($cachedCertificate)) {
+            return Response::streamDownload(function () use ($cachedCertificate) {
+                readfile($cachedCertificate);
+            }, 'certificate_' . $code . '.png', [
+                'Content-Type' => 'image/png',
+            ]);
+        }
+
+        // If not exists on cache
 
         $edition = $certificate->edition;
         $certificateOptions = $edition->options->certificate ?? null;
@@ -103,9 +117,16 @@ class CertificatesDownloadController extends Controller
         // Convert the image to binary PNG data
         $data = CertificateHelper::getData($image);
 
+        if ($data === null) {
+            return response()->json(['found' => false, 'error' => 'Image generation failed'], 500);
+        }
+
         // Update the 'last_view_at' timestamp
         $certificate->last_view_at = DateTimeImmutable::createFromMutable(new DateTime());
         $certificate->save();
+
+        // ==== Cache the generated certificate ====
+        CertificateStorageHelper::save($certificate->code, $data);
 
         // Stream the image as a download response
         return Response::streamDownload(function () use ($data) {

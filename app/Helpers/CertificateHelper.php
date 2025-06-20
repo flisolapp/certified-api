@@ -286,16 +286,17 @@ class CertificateHelper
      * Converts the image data into a string format.
      *
      * @param GdImage $image The image resource to convert.
-     * @return string|false The image data as a string or false on failure.
+     * @return string The image data as a string or false on failure.
      */
-    public static function getData(GdImage $image): string|false
+    public static function getData(GdImage $image): ?string
     {
         ob_start();
+        $success = imagepng($image);
+        $data = ob_get_clean();
 
-        imagepng($image);
         imagedestroy($image);
 
-        return ob_get_clean();
+        return $success && $data !== false ? $data : null;
     }
 
 }
