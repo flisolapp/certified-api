@@ -153,10 +153,10 @@ class CertificatesReleaseController extends Controller
                 $certificate->save();
             }
 
-            return response()->json(['message' => 'Person certificates released successfully.']);
+            return response()->json(['message' => 'Certificates released successfully.']);
         } catch (Exception $e) {
             DB::rollBack();
-            Log::error('Error populating person certificates: ' . $e->getMessage());
+            Log::error('Error populating certificates: ' . $e->getMessage());
             return response()->json(['error' => 'Failed to populate certificates.'], 500);
         }
     }
