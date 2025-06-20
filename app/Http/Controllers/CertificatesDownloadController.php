@@ -74,7 +74,7 @@ class CertificatesDownloadController extends Controller
         }
 
         // Talk title if applicable
-        if ($certificate->talk && !$certificate->name_only) {
+        if ($certificate->talk) {
             $title = $certificate->talk->title;
             $titleColor = imagecolorallocate($image, 74, 79, 82);
             imagefttext($image, 18, 0, 114, 570, $titleColor, $font, $title);
@@ -110,38 +110,22 @@ class CertificatesDownloadController extends Controller
     private function resolveCertificateTemplate(object $certificate, object $certificateOptions, string $editionDir, string $editionId): array
     {
         $defaultColor = '#FE8200';
+        $types = [
+            'organizer' => 'organizer',
+            'collaborator' => 'collaborator',
+            'talk' => 'speaker',
+            'participant' => 'participant'
+        ];
 
-        if ($certificate->organizer && isset($certificateOptions->organizer)) {
-            return [
-                implode(DIRECTORY_SEPARATOR, [$editionDir, $editionId, $certificateOptions->organizer->file]),
-                $certificateOptions->organizer->color
-            ];
-        }
+        foreach ($types as $property => $optionKey) {
+            if ($certificate->$property && isset($certificateOptions->$optionKey)) {
+                $option = $certificateOptions->$optionKey;
 
-        if ($certificate->collaborator && isset($certificateOptions->collaborator)) {
-            return [
-                implode(DIRECTORY_SEPARATOR, [$editionDir, $editionId, $certificateOptions->collaborator->file]),
-                $certificateOptions->collaborator->color
-            ];
-        }
-
-        if ($certificate->talk && isset($certificateOptions->speaker)) {
-            $isNameOnly = $certificate->name_only ?? false;
-            $options = $isNameOnly ? ($certificateOptions->speaker_name_only ?? null) : $certificateOptions->speaker;
-
-            if ($options) {
                 return [
-                    implode(DIRECTORY_SEPARATOR, [$editionDir, $editionId, $options->file]),
-                    $options->color
+                    implode(DIRECTORY_SEPARATOR, [$editionDir, $editionId, $option->file]),
+                    $option->color
                 ];
             }
-        }
-
-        if ($certificate->participant && isset($certificateOptions->participant)) {
-            return [
-                implode(DIRECTORY_SEPARATOR, [$editionDir, $editionId, $certificateOptions->participant->file]),
-                $certificateOptions->participant->color
-            ];
         }
 
         return [null, $defaultColor];

@@ -10,8 +10,7 @@ return new class extends Migration {
         Schema::create('student_infos', function (Blueprint $table) {
             $table->id();
             $table->string('name');
-            $table->timestamp('created_at');
-            $table->timestamp('updated_at');
+            $table->timestamps();
             $table->timestamp('removed_at')->nullable();
         });
     }

@@ -22,8 +22,7 @@ return new class extends Migration {
             $table->string('student_place')->nullable();
             $table->string('student_course')->nullable();
             $table->string('address_state')->nullable();  // original type: char(2)
-            $table->timestamp('created_at');
-            $table->timestamp('updated_at');
+            $table->timestamps();
             $table->timestamp('removed_at')->nullable();
         });
     }

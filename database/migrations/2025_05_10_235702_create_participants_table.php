@@ -16,8 +16,7 @@ return new class extends Migration {
             $table->timestamp('prizedraw_winner_at')->nullable();
             $table->unsignedBigInteger('prizedraw_order')->nullable();
             $table->string('prizedraw_description')->nullable();
-            $table->timestamp('created_at');
-            $table->timestamp('updated_at');
+            $table->timestamps();
             $table->timestamp('removed_at')->nullable();
         });
     }

@@ -15,8 +15,7 @@ return new class extends Migration {
             $table->string('audit_note')->nullable();
             $table->timestamp('approved_at')->nullable();
             $table->timestamp('confirmed_at')->nullable();
-            $table->timestamp('created_at');
-            $table->timestamp('updated_at');
+            $table->timestamps();
             $table->timestamp('removed_at')->nullable();
         });
     }

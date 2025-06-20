@@ -11,8 +11,7 @@ return new class extends Migration {
             $table->id();
             $table->string('name');
             $table->string('acronym');  // original type: char(2)
-            $table->timestamp('created_at');
-            $table->timestamp('updated_at');
+            $table->timestamps();
             $table->timestamp('removed_at')->nullable();
         });
     }

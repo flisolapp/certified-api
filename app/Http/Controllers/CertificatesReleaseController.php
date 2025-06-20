@@ -18,8 +18,11 @@ use Illuminate\Support\Facades\Log;
 
 class CertificatesReleaseController extends Controller
 {
+
     public function execute(): JsonResponse
     {
+        set_time_limit(0);
+
         $edition = Edition::where('active', 1)->orderByDesc('id')->first();
         if (!$edition) {
             return response()->json(['error' => 'No active edition found.'], 404);
@@ -166,4 +169,5 @@ class CertificatesReleaseController extends Controller
 
         return $code;
     }
+
 }

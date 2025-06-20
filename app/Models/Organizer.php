@@ -6,7 +6,6 @@ use Illuminate\Database\Eloquent\Model;
 
 class Organizer extends Model
 {
-    // protected $table = 'organizer';
 
     protected $fillable = [
         'edition_id', 'people_id', 'created_at', 'updated_at', 'removed_at'

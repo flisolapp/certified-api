@@ -4,6 +4,7 @@ namespace App\Helpers;
 
 class StringHelper
 {
+
     /**
      * Formats a person's name: proper casing and limited character count.
      *
@@ -31,4 +32,5 @@ class StringHelper
 
         return $name;
     }
+
 }

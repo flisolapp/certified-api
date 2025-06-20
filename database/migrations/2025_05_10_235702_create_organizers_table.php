@@ -11,8 +11,7 @@ return new class extends Migration {
             $table->id();
             $table->unsignedBigInteger('edition_id');
             $table->unsignedBigInteger('people_id');
-            $table->timestamp('created_at');
-            $table->timestamp('updated_at');
+            $table->timestamps();
             $table->timestamp('removed_at')->nullable();
         });
     }

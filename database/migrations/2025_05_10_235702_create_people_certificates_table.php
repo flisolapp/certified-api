@@ -18,11 +18,9 @@ return new class extends Migration {
             $table->string('name');
             $table->string('federal_code')->nullable();
             $table->string('code')->nullable();
-            $table->boolean('name_only')->default(false);
             $table->timestamp('sent_at')->nullable();
             $table->timestamp('last_view_at')->nullable();
-            $table->timestamp('created_at');
-            $table->timestamp('updated_at');
+            $table->timestamps();
             $table->timestamp('removed_at')->nullable();
         });
     }

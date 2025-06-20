@@ -4,8 +4,8 @@ namespace App\Helpers;
 
 class ColorHelper
 {
+
     /**
-     *
      * // Example usage
      * $color = "#FE8200";
      * $rgb = hexToRgb($color);
@@ -50,4 +50,5 @@ class ColorHelper
         // Convert the integers to hexadecimal strings and concatenate them with a leading '#'
         return sprintf('#%02x%02x%02x', $red, $green, $blue);
     }
+
 }

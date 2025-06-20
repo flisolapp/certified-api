@@ -7,7 +7,6 @@ use Throwable;
 
 class Edition extends Model
 {
-    // protected $table = 'edition';
 
     protected $fillable = [
         'year', 'options', 'active', 'created_at', 'updated_at', 'removed_at'
@@ -27,4 +26,5 @@ class Edition extends Model
             return null;
         }
     }
+
 }
