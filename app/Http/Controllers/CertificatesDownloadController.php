@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Helpers\CertificateHelper;
 use App\Helpers\ColorHelper;
+use App\Helpers\S3StorageCacheHelper;
 use App\Models\PeopleCertificate;
 use DateTime;
 use DateTimeImmutable;
@@ -14,86 +15,99 @@ use Symfony\Component\HttpFoundation\StreamedResponse;
 class CertificatesDownloadController extends Controller
 {
 
+    /**
+     * Main execution method to generate and download the certificate as PNG.
+     *
+     * @param string $code Unique certificate code for validation.
+     * @return StreamedResponse|JsonResponse
+     */
     public function execute(string $code): StreamedResponse|JsonResponse
     {
+        // Remove PHP time and memory limits for large image processing
         $this->removeMemoryAndTimeLimits();
 
-        $certificate = PeopleCertificate::with(['edition', 'talk'])->where('code', $code)
+        // Retrieve certificate with edition and talk relationships
+        $certificate = PeopleCertificate::with(['edition', 'talk'])
+            ->where('code', $code)
             ->whereNull('removed_at')
             ->first();
 
+        // If certificate or edition not found, return 404
         if (!$certificate || !$certificate->edition) {
             return response()->json(['found' => false], 404);
         }
 
         $edition = $certificate->edition;
         $certificateOptions = $edition->options->certificate ?? null;
-        $editionDir = config('certificates.uploads.edition');
         $editionId = $edition->id;
         $name = $certificate->name;
         $codeVerificationUrl = 'https://certified.flisol.app/' . $certificate->code;
 
-        $font = implode(DIRECTORY_SEPARATOR, [$editionDir, $editionId, $certificateOptions->font ?? 'NunitoSans-Bold.ttf']);
+        // Load and cache font from S3 (stored per edition)
+        $fontFileName = $certificateOptions->font ?? 'NunitoSans-Bold.ttf';
+        $fontKey = "editions/{$editionId}/{$fontFileName}";
+        $font = S3StorageCacheHelper::getFile($fontKey);
 
-        [$certificateFile, $colorHex] = $this->resolveCertificateTemplate($certificate, $certificateOptions, $editionDir, $editionId);
-
-        if (!$certificateFile || !file_exists($certificateFile)) {
-            return response()->json(['found' => false], 404);
+        // Abort if font file was not found
+        if (!$font || !file_exists($font)) {
+            return response()->json(['found' => false, 'error' => 'Font not found'], 404);
         }
 
+        // Resolve the certificate background image (template) and text color
+        [$certificateFile, $colorHex] = $this->resolveCertificateTemplate($certificate, $certificateOptions, $editionId);
+
+        // Abort if template was not found
+        if (!$certificateFile || !file_exists($certificateFile)) {
+            return response()->json(['found' => false, 'error' => 'Template not found'], 404);
+        }
+
+        // Load the PNG certificate template image
         $image = @imagecreatefrompng($certificateFile);
 
+        // Draw participant name (with optional second line if too long)
         if ($name) {
-            // Draw shadow
-            // $shadow = imagecolorallocate($image, 240, 240, 240);
-            // imagefttext($image, 60, 0, 109, 471, $shadow, $font, $name);
             [$firstLine, $secondLine] = $this->splitTextBySpace($name, 23);
 
-            // Draw shadow for the first line
+            // Draw shadow (light gray) behind the text for better visibility
             $shadow = imagecolorallocate($image, 240, 240, 240);
             imagefttext($image, 60, 0, 109, 471, $shadow, $font, $firstLine);
-
-            // Draw shadow for the second line, if it exists
             if ($secondLine) {
                 imagefttext($image, 60, 0, 109, 551, $shadow, $font, $secondLine);
             }
 
-            // Draw name
+            // Draw actual participant name (colored)
             $rgb = ColorHelper::hexToRgb($colorHex);
             $nameColor = imagecolorallocate($image, $rgb->red, $rgb->green, $rgb->blue);
-            // imagefttext($image, 60, 0, 108, 470, $nameColor, $font, $name);
-            [$firstLine, $secondLine] = $this->splitTextBySpace($name, 23);
-
-            // Draw the first line
             imagefttext($image, 60, 0, 108, 470, $nameColor, $font, $firstLine);
-
-            // Draw the second line, if it exists
             if ($secondLine) {
                 imagefttext($image, 60, 0, 108, 550, $nameColor, $font, $secondLine);
             }
         }
 
-        // Talk title if applicable
+        // Draw talk title if this certificate is linked to a talk
         if ($certificate->talk) {
             $title = $certificate->talk->title;
             $titleColor = imagecolorallocate($image, 74, 79, 82);
             imagefttext($image, 18, 0, 114, 570, $titleColor, $font, $title);
         }
 
-        // Extra elements
+        // Optional: Draw CPF if available
         if ($certificate->federal_code) {
             CertificateHelper::addFederalCode($image, 'CPF', $certificate->federal_code, 12, 23);
         }
 
+        // Add code verification URL and QR code to the certificate
         CertificateHelper::addCodeVerificationUrl($image, $codeVerificationUrl, 1586, 0);
         CertificateHelper::addQrCode($image, $codeVerificationUrl, 1280, 780);
 
+        // Convert the image to binary PNG data
         $data = CertificateHelper::getData($image);
 
-        // Update last view
+        // Update the 'last_view_at' timestamp
         $certificate->last_view_at = DateTimeImmutable::createFromMutable(new DateTime());
         $certificate->save();
 
+        // Stream the image as a download response
         return Response::streamDownload(function () use ($data) {
             echo $data;
         }, 'certificate_' . $certificate->code . '.png', [
@@ -101,15 +115,30 @@ class CertificatesDownloadController extends Controller
         ]);
     }
 
+    /**
+     * Remove PHP time and memory limits for large image generation.
+     */
     private function removeMemoryAndTimeLimits(): void
     {
         ini_set('memory_limit', '-1');
         set_time_limit(0);
     }
 
-    private function resolveCertificateTemplate(object $certificate, object $certificateOptions, string $editionDir, string $editionId): array
+    /**
+     * Resolve the correct certificate template (PNG) and text color based on the certificate type.
+     *
+     * Priority order:
+     * Organizer > Collaborator > Talk (Speaker) > Participant
+     *
+     * @param object $certificate
+     * @param object|null $certificateOptions
+     * @param string $editionId
+     * @return array [file path, hex color]
+     */
+    private function resolveCertificateTemplate(object $certificate, ?object $certificateOptions, string $editionId): array
     {
         $defaultColor = '#FE8200';
+
         $types = [
             'organizer' => 'organizer',
             'collaborator' => 'collaborator',
@@ -121,23 +150,30 @@ class CertificatesDownloadController extends Controller
             if ($certificate->$property && isset($certificateOptions->$optionKey)) {
                 $option = $certificateOptions->$optionKey;
 
-                return [
-                    implode(DIRECTORY_SEPARATOR, [$editionDir, $editionId, $option->file]),
-                    $option->color
-                ];
+                // Load template file from S3 and cache locally
+                $fileKey = "editions/{$editionId}/{$option->file}";
+                $file = S3StorageCacheHelper::getFile($fileKey);
+
+                return [$file, $option->color];
             }
         }
 
         return [null, $defaultColor];
     }
 
+    /**
+     * Splits a long name into two lines, breaking at the nearest space close to the desired length.
+     *
+     * @param string $text The original text to split.
+     * @param int $near Preferred max length for the first line.
+     * @return array [firstLine, secondLine|null]
+     */
     private function splitTextBySpace(string $text, int $near): array
     {
         if (mb_strlen($text) <= $near) {
             return [$text, null];
         }
 
-        // Find space before or after the target length
         $before = mb_strrpos(mb_substr($text, 0, $near + 1), ' ');
         $after = mb_strpos($text, ' ', $near);
 
@@ -146,10 +182,10 @@ class CertificatesDownloadController extends Controller
         }
 
         $splitPos = $before !== false ? $before : $after;
-
         $firstLine = trim(mb_substr($text, 0, $splitPos));
         $secondLine = trim(mb_substr($text, $splitPos));
 
         return [$firstLine, $secondLine];
     }
+
 }
