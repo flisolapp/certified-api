@@ -2,6 +2,7 @@
 
 namespace App\Helpers;
 
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Storage;
 use RuntimeException;
 use Throwable;
@@ -12,13 +13,17 @@ class CertificateStorageHelper
     private static array $cache = [];
 
     /**
-     * Returns the local path for a certificate image.
-     * If not cached locally, downloads from S3 or triggers generation (caller responsibility).
+     * Retrieves the local file path for a certificate PNG.
      *
-     * @param string $code
-     * @return string|null
+     * If the file exists locally, returns the cached path.
+     * If not, attempts to download from S3.
+     * Returns null if the file does not exist in either location.
+     *
+     * @param int $editionId Edition ID used for folder scoping.
+     * @param string $code Certificate code.
+     * @return string|null Local file path or null if not found.
      */
-    public static function getOrDownload(string $code): ?string
+    public static function getOrDownload(int $editionId, string $code): ?string
     {
         if (isset(self::$cache[$code])) {
             return self::$cache[$code];
@@ -27,36 +32,37 @@ class CertificateStorageHelper
         $diskS3 = Storage::disk('s3');
         $diskLocal = Storage::disk('local');
 
-        $s3Key = "certificates/{$code}.png";
-        $localPath = "cache/certificates/{$code}.png";
+        $s3Key = "certificates/{$editionId}/{$code}.png";
+        $localPath = "cache/certificates/{$editionId}/{$code}.png";
 
+        // Check local cache
         if ($diskLocal->exists($localPath)) {
-            self::$cache[$code] = $diskLocal->path($localPath);
-            return self::$cache[$code];
+            return self::$cache[$code] = $diskLocal->path($localPath);
         }
 
-        if ($diskS3->exists($s3Key)) {
-            try {
-                $diskLocal->put($localPath, $diskS3->get($s3Key));
-                self::$cache[$code] = $diskLocal->path($localPath);
-                return self::$cache[$code];
-            } catch (Throwable $e) {
-                // Importante: capture Throwable para pegar Error e Exception
-                // \Log::error("Failed to get S3 object '{$s3Key}': " . $e->getMessage());
+        // Try downloading from S3
+        try {
+            if ($diskS3->exists($s3Key)) {
+                $binaryContent = $diskS3->get($s3Key);
+                $diskLocal->put($localPath, $binaryContent);
+                return self::$cache[$code] = $diskLocal->path($localPath);
             }
+        } catch (Throwable $e) {
+            Log::error("S3 get failed for '{$s3Key}': " . $e->getMessage());
         }
 
         return null;
     }
 
     /**
-     * Saves the generated PNG both locally and on S3.
+     * Saves the generated certificate PNG to both local cache and S3.
      *
-     * @param string $code
-     * @param string $binaryData
+     * @param int $editionId Edition ID used for folder scoping.
+     * @param string $code Certificate code.
+     * @param string $binaryData PNG binary content.
      * @return void
      */
-    public static function save(string $code, string $binaryData): void
+    public static function save(int $editionId, string $code, string $binaryData): void
     {
         if ($binaryData === null) {
             throw new RuntimeException("Cannot save null certificate data for code: {$code}");
@@ -65,8 +71,8 @@ class CertificateStorageHelper
         $diskS3 = Storage::disk('s3');
         $diskLocal = Storage::disk('local');
 
-        $s3Key = "certificates/{$code}.png";
-        $localPath = "cache/certificates/{$code}.png";
+        $s3Key = "certificates/{$editionId}/{$code}.png";
+        $localPath = "cache/certificates/{$editionId}/{$code}.png";
 
         $diskLocal->put($localPath, $binaryData);
         $diskS3->put($s3Key, $binaryData);

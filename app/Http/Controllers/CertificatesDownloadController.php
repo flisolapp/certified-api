@@ -38,8 +38,14 @@ class CertificatesDownloadController extends Controller
             return response()->json(['found' => false], 404);
         }
 
+        $edition = $certificate->edition;
+        $certificateOptions = $edition->options->certificate ?? null;
+        $editionId = $edition->id;
+        $name = $certificate->name;
+        $codeVerificationUrl = 'https://certified.flisol.app/' . $certificate->code;
+
         // Cache check
-        $cachedCertificate = CertificateStorageHelper::getOrDownload($code);
+        $cachedCertificate = CertificateStorageHelper::getOrDownload($editionId, $code);
 
         if ($cachedCertificate && file_exists($cachedCertificate)) {
             return Response::streamDownload(function () use ($cachedCertificate) {
@@ -50,12 +56,6 @@ class CertificatesDownloadController extends Controller
         }
 
         // If not exists on cache
-
-        $edition = $certificate->edition;
-        $certificateOptions = $edition->options->certificate ?? null;
-        $editionId = $edition->id;
-        $name = $certificate->name;
-        $codeVerificationUrl = 'https://certified.flisol.app/' . $certificate->code;
 
         // Load and cache font from S3 (stored per edition)
         $fontFileName = $certificateOptions->font ?? 'NunitoSans-Bold.ttf';
@@ -126,7 +126,7 @@ class CertificatesDownloadController extends Controller
         $certificate->save();
 
         // ==== Cache the generated certificate ====
-        CertificateStorageHelper::save($certificate->code, $data);
+        CertificateStorageHelper::save($editionId, $certificate->code, $data);
 
         // Stream the image as a download response
         return Response::streamDownload(function () use ($data) {
