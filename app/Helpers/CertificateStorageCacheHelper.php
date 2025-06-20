@@ -7,7 +7,7 @@ use Illuminate\Support\Facades\Storage;
 use RuntimeException;
 use Throwable;
 
-class CertificateStorageHelper
+class CertificateStorageCacheHelper
 {
 
     private static array $cache = [];

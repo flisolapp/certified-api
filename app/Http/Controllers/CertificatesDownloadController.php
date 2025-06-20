@@ -3,7 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Helpers\CertificateHelper;
-use App\Helpers\CertificateStorageHelper;
+use App\Helpers\CertificateStorageCacheHelper;
 use App\Helpers\ColorHelper;
 use App\Helpers\StorageCacheHelper;
 use App\Models\PeopleCertificate;
@@ -45,7 +45,7 @@ class CertificatesDownloadController extends Controller
         $codeVerificationUrl = 'https://certified.flisol.app/' . $certificate->code;
 
         // Cache check
-        $cachedCertificate = CertificateStorageHelper::getOrDownload($editionId, $code);
+        $cachedCertificate = CertificateStorageCacheHelper::getOrDownload($editionId, $code);
 
         if ($cachedCertificate && file_exists($cachedCertificate)) {
             return Response::streamDownload(function () use ($cachedCertificate) {
@@ -126,7 +126,7 @@ class CertificatesDownloadController extends Controller
         $certificate->save();
 
         // ==== Cache the generated certificate ====
-        CertificateStorageHelper::save($editionId, $certificate->code, $data);
+        CertificateStorageCacheHelper::save($editionId, $certificate->code, $data);
 
         // Stream the image as a download response
         return Response::streamDownload(function () use ($data) {
