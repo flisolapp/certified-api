@@ -2,7 +2,9 @@
 
 namespace App\Helpers;
 
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Storage;
+use Throwable;
 
 class StorageCacheHelper
 {
@@ -18,12 +20,17 @@ class StorageCacheHelper
         $disk = Storage::disk('s3');
         $localDisk = Storage::disk('storage_cache');
 
-        if (!$localDisk->exists($key)) {
-            if (!Storage::disk('s3')->exists($key)) {
-                return null;
-            }
+        // Try downloading from S3
+        try {
+            if (!$localDisk->exists($key)) {
+                if (!Storage::disk('s3')->exists($key)) {
+                    return null;
+                }
 
-            $localDisk->put($key, $disk->get($key));
+                $localDisk->put($key, $disk->get($key));
+            }
+        } catch (Throwable $e) {
+            Log::error("S3 get failed for '{$key}': " . $e->getMessage());
         }
 
         self::$cache[$key] = $localDisk->path($key);

@@ -5,7 +5,6 @@ namespace App\Helpers;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Storage;
 use RuntimeException;
-use Throwable;
 
 class CertificateStorageCacheHelper
 {
@@ -15,9 +14,9 @@ class CertificateStorageCacheHelper
     /**
      * Retrieves the local file path for a certificate PNG.
      *
-     * If the file exists locally, returns the cached path.
-     * If not, attempts to download from S3.
-     * Returns null if the file does not exist in either location.
+     * If exists locally, returns the cached path.
+     * If not, attempts to download from S3 via StorageCacheHelper.
+     * Returns null if not found in either location.
      *
      * @param int $editionId Edition ID used for folder scoping.
      * @param string $code Certificate code.
@@ -29,27 +28,15 @@ class CertificateStorageCacheHelper
             return self::$cache[$code];
         }
 
-        $diskS3 = Storage::disk('s3');
-        $diskLocal = Storage::disk('storage_cache');
-
         $s3Key = "certificates/{$editionId}/{$code}.png";
-        $localPath = "certificates/{$editionId}/{$code}.png";
 
-        // Check local cache
-        if ($diskLocal->exists($localPath)) {
-            return self::$cache[$code] = $diskLocal->path($localPath);
+        $filePath = StorageCacheHelper::getFileFromS3($s3Key);
+
+        if ($filePath !== null) {
+            return self::$cache[$code] = $filePath;
         }
 
-        // Try downloading from S3
-        try {
-            if ($diskS3->exists($s3Key)) {
-                $binaryContent = $diskS3->get($s3Key);
-                $diskLocal->put($localPath, $binaryContent);
-                return self::$cache[$code] = $diskLocal->path($localPath);
-            }
-        } catch (Throwable $e) {
-            Log::error("S3 get failed for '{$s3Key}': " . $e->getMessage());
-        }
+        Log::warning("Certificate file not found in local cache or S3: {$s3Key}");
 
         return null;
     }
