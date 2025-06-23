@@ -101,7 +101,7 @@ class CertificatesDownloadController extends Controller
         if ($certificate->talk) {
             $title = $certificate->talk->title;
             $titleColor = imagecolorallocate($image, 74, 79, 82);
-            imagefttext($image, 18, 0, 114, 570, $titleColor, $font, $title);
+            imagefttext($image, 18, 0, 114, 620, $titleColor, $font, $title);
         }
 
         // Optional: Draw CPF if available
