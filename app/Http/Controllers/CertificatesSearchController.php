@@ -51,7 +51,7 @@ class CertificatesSearchController extends Controller
 
             $unit = null;
             if (!empty($item->edition->options) && is_object($item->edition->options)) {
-                $unit = $item->edition->options->unit->acronym ?? null;
+                $unit = $item->edition->options->unit ?? null;
             }
 
             return [
