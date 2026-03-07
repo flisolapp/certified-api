@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Helpers\CertificateHelper;
 use App\Helpers\ColorHelper;
 use App\Helpers\StorageCacheHelper;
+use App\Helpers\StringHelper;
 use App\Models\PeopleCertificate;
 use DateTime;
 use DateTimeImmutable;
@@ -79,7 +80,7 @@ class CertificatesDownloadController extends Controller
 
         // Draw participant name (with optional second line if too long)
         if ($name) {
-            [$firstLine, $secondLine] = $this->splitTextBySpace($name, 23);
+            [$firstLine, $secondLine] = StringHelper::splitTextBySpace($name, 23);
 
             // Draw shadow (light gray) behind the text for better visibility
             $shadow = imagecolorallocate($image, 240, 240, 240);
@@ -179,33 +180,6 @@ class CertificatesDownloadController extends Controller
         }
 
         return [null, $defaultColor];
-    }
-
-    /**
-     * Splits a long name into two lines, breaking at the nearest space close to the desired length.
-     *
-     * @param string $text The original text to split.
-     * @param int $near Preferred max length for the first line.
-     * @return array [firstLine, secondLine|null]
-     */
-    private function splitTextBySpace(string $text, int $near): array
-    {
-        if (mb_strlen($text) <= $near) {
-            return [$text, null];
-        }
-
-        $before = mb_strrpos(mb_substr($text, 0, $near + 1), ' ');
-        $after = mb_strpos($text, ' ', $near);
-
-        if ($before === false && $after === false) {
-            return [$text, null];
-        }
-
-        $splitPos = $before !== false ? $before : $after;
-        $firstLine = trim(mb_substr($text, 0, $splitPos));
-        $secondLine = trim(mb_substr($text, $splitPos));
-
-        return [$firstLine, $secondLine];
     }
 
 }
