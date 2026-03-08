@@ -8,6 +8,7 @@
     "require": {
         "php": "^8.5",
         "ext-bcmath": "*",
+        "ext-fileinfo": "*",
         "ext-gd": "*",
         "chillerlan/php-qrcode": "5.0.5",
         "dedoc/scramble": "0.13.14",
