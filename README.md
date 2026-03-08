@@ -15,7 +15,7 @@ REST API backend for the Certificate Verifier UI. Built with Laravel and secured
 
 | Tool     | Version |
 |----------|---------|
-| PHP      | 8.5.1   |
+| PHP      | 8.5.0   |
 | Composer | 2.9.5   |
 | Laravel  | 12.53.0 |
 
