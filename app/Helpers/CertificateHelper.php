@@ -5,6 +5,8 @@ namespace App\Helpers;
 use App\Dto\QrCodeImage;
 use chillerlan\QRCode\QRCode;
 use chillerlan\QRCode\QROptions;
+use chillerlan\QRCode\Output\QRGdImagePNG;
+use chillerlan\QRCode\Common\EccLevel;
 use GdImage;
 
 /**
@@ -237,13 +239,12 @@ class CertificateHelper
             return null;
         }
 
-        $options = new QROptions([
-            'version' => 10,
-            'outputType' => QRCode::OUTPUT_IMAGE_PNG,
-            'eccLevel' => QRCode::ECC_H,
-            'scale' => 5,
-            'imageBase64' => false,
-        ]);
+        $options = new QROptions();
+        $options->version = 10;
+        $options->outputInterface = QRGdImagePNG::class;
+        $options->eccLevel = EccLevel::H;
+        $options->scale = 5;
+        $options->outputBase64 = false;
 
         $file = tmpfile();
         $filePath = stream_get_meta_data($file)['uri'];

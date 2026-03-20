@@ -63,7 +63,6 @@ return [
         'storage_cache' => [
             'driver' => 'local',
             'root' => storage_path('framework/cache/data'),
-            'serve' => true,
             'throw' => false,
             'report' => false,
         ],

@@ -15,9 +15,9 @@ REST API backend for the Certificate Verifier UI. Built with Laravel and secured
 
 | Tool     | Version |
 |----------|---------|
-| PHP      | 8.5.0   |
+| PHP      | 8.3.0   |
 | Composer | 2.9.5   |
-| Laravel  | 12.53.0 |
+| Laravel  | 13.1.1  |
 
 ## Installation
 
@@ -25,6 +25,17 @@ REST API backend for the Certificate Verifier UI. Built with Laravel and secured
 
 ```bash
 git clone <repository-url> certified-api
+```
+
+Or create a new project with:
+
+```bash
+composer create-project laravel/laravel certified-api
+```
+
+After:
+
+```bash
 cd certified-api
 composer install
 ```
@@ -66,13 +77,15 @@ class User extends Authenticatable
 ### 4. Install additional packages
 
 ```bash
-composer require chillerlan/php-qrcode league/flysystem-aws-s3-v3
+composer require chillerlan/php-qrcode
+composer require league/flysystem-aws-s3-v3
 composer require dedoc/scramble
 ```
 
 ### 5. Run migrations
 
 ```bash
+php artisan migrate
 php artisan migrate:install
 php artisan schema:dump
 php artisan migrate --seed
@@ -183,9 +196,21 @@ Laravel is accessible, powerful, and provides tools required for large, robust a
 
 Laravel has the most extensive and thorough [documentation](https://laravel.com/docs) and video tutorial library of all modern web application frameworks, making it a breeze to get started with the framework.
 
-You may also try the [Laravel Bootcamp](https://bootcamp.laravel.com), where you will be guided through building a modern Laravel application from scratch.
+In addition, [Laracasts](https://laracasts.com) contains thousands of video tutorials on a range of topics including Laravel, modern PHP, unit testing, and JavaScript. Boost your skills by digging into our comprehensive video library.
 
-If you don't feel like reading, [Laracasts](https://laracasts.com) can help. Laracasts contains thousands of video tutorials on a range of topics including Laravel, modern PHP, unit testing, and JavaScript. Boost your skills by digging into our comprehensive video library.
+You can also watch bite-sized lessons with real-world projects on [Laravel Learn](https://laravel.com/learn), where you will be guided through building a Laravel application from scratch while learning PHP fundamentals.
+
+## Agentic Development
+
+Laravel's predictable structure and conventions make it ideal for AI coding agents like Claude Code, Cursor, and GitHub Copilot. Install [Laravel Boost](https://laravel.com/docs/ai) to supercharge your AI workflow:
+
+```bash
+composer require laravel/boost --dev
+
+php artisan boost:install
+```
+
+Boost provides your agent 15+ tools and skills that help agents build Laravel applications while following best practices.
 
 ## Laravel Sponsors
 
