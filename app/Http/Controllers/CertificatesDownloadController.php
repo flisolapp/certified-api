@@ -15,11 +15,24 @@ use Symfony\Component\HttpFoundation\StreamedResponse;
 
 class CertificatesDownloadController extends Controller
 {
-
     /**
-     * Main execution method to generate and download the certificate as PNG.
+     * Generate and download a certificate image as PNG.
      *
-     * @param string $code Unique certificate code for validation.
+     * This endpoint validates the provided certificate code, resolves the correct
+     * certificate template for the certificate type, renders the participant name
+     * and optional metadata on top of the template, stores the generated PNG in cache,
+     * updates the certificate last view timestamp, and streams the final file.
+     *
+     * When a previously generated PNG already exists in cache, the cached file is
+     * streamed directly instead of rendering the image again.
+     *
+     * Possible responses:
+     * - 200: Certificate PNG file streamed successfully
+     * - 404: Certificate, edition, font, or template was not found
+     * - 500: Certificate image generation failed
+     *
+     * @param string $code Unique public certificate verification code.
+     *
      * @return StreamedResponse|JsonResponse
      */
     public function execute(string $code): StreamedResponse|JsonResponse
@@ -27,13 +40,13 @@ class CertificatesDownloadController extends Controller
         // Remove PHP time and memory limits for large image processing
         $this->removeMemoryAndTimeLimits();
 
-        // Retrieve certificate with edition and talk relationships
+        // Retrieve certificate with required relationships
         $certificate = PeopleCertificate::with(['edition', 'talk'])
             ->where('code', $code)
             ->whereNull('removed_at')
             ->first();
 
-        // If certificate or edition not found, return 404
+        // Certificate or related edition not found
         if (!$certificate || !$certificate->edition) {
             return response()->json(['found' => false], 404);
         }
@@ -44,7 +57,7 @@ class CertificatesDownloadController extends Controller
         $name = $certificate->name;
         $codeVerificationUrl = 'https://certified.flisol.app/' . $certificate->code;
 
-        // Cache check
+        // Serve cached PNG when available
         $cachedCertificate = StorageCacheHelper::get("certificates/{$editionId}/{$certificate->code}.png");
 
         if ($cachedCertificate && file_exists($cachedCertificate)) {
@@ -55,80 +68,91 @@ class CertificatesDownloadController extends Controller
             ]);
         }
 
-        // If not exists on cache
-
-        // Load and cache font from S3 (stored per edition)
+        // Load and locally cache the font file configured for the edition
         $fontFileName = $certificateOptions->font ?? 'NunitoSans-Bold.ttf';
         $fontKey = "editions/{$editionId}/{$fontFileName}";
         $font = StorageCacheHelper::get($fontKey);
 
-        // Abort if font file was not found
         if (!$font || !file_exists($font)) {
-            return response()->json(['found' => false, 'error' => 'Font not found'], 404);
+            return response()->json([
+                'found' => false,
+                'error' => 'Font not found',
+            ], 404);
         }
 
-        // Resolve the certificate background image (template) and text color
-        [$certificateFile, $colorHex] = $this->resolveCertificateTemplate($certificate, $certificateOptions, $editionId);
+        // Resolve certificate background template and main text color
+        [$certificateFile, $colorHex] = $this->resolveCertificateTemplate(
+            $certificate,
+            $certificateOptions,
+            $editionId
+        );
 
-        // Abort if template was not found
         if (!$certificateFile || !file_exists($certificateFile)) {
-            return response()->json(['found' => false, 'error' => 'Template not found'], 404);
+            return response()->json([
+                'found' => false,
+                'error' => 'Template not found',
+            ], 404);
         }
 
-        // Load the PNG certificate template image
+        // Load the certificate template image
         $image = @imagecreatefrompng($certificateFile);
 
-        // Draw participant name (with optional second line if too long)
+        // Render participant name
         if ($name) {
             [$firstLine, $secondLine] = StringHelper::splitTextBySpace($name, 23);
 
-            // Draw shadow (light gray) behind the text for better visibility
+            // Shadow for readability
             $shadow = imagecolorallocate($image, 240, 240, 240);
             imagefttext($image, 60, 0, 109, 471, $shadow, $font, $firstLine);
+
             if ($secondLine) {
                 imagefttext($image, 60, 0, 109, 551, $shadow, $font, $secondLine);
             }
 
-            // Draw actual participant name (colored)
+            // Main name text color
             $rgb = ColorHelper::hexToRgb($colorHex);
             $nameColor = imagecolorallocate($image, $rgb->red, $rgb->green, $rgb->blue);
             imagefttext($image, 60, 0, 108, 470, $nameColor, $font, $firstLine);
+
             if ($secondLine) {
                 imagefttext($image, 60, 0, 108, 550, $nameColor, $font, $secondLine);
             }
         }
 
-        // Draw talk title if this certificate is linked to a talk
+        // Render talk title for speaker-related certificates
         if ($certificate->talk) {
             $title = $certificate->talk->title;
             $titleColor = imagecolorallocate($image, 74, 79, 82);
             imagefttext($image, 18, 0, 114, 620, $titleColor, $font, $title);
         }
 
-        // Optional: Draw CPF if available
+        // Render CPF when available
         if ($certificate->federal_code) {
             CertificateHelper::addFederalCode($image, 'CPF', $certificate->federal_code, 12, 23);
         }
 
-        // Add code verification URL and QR code to the certificate
+        // Render verification URL and QR code
         CertificateHelper::addCodeVerificationUrl($image, $codeVerificationUrl, 1586, 0);
         CertificateHelper::addQrCode($image, $codeVerificationUrl, 1280, 780);
 
-        // Convert the image to binary PNG data
+        // Convert image resource to PNG binary
         $data = CertificateHelper::getData($image);
 
         if ($data === null) {
-            return response()->json(['found' => false, 'error' => 'Image generation failed'], 500);
+            return response()->json([
+                'found' => false,
+                'error' => 'Image generation failed',
+            ], 500);
         }
 
-        // Update the 'last_view_at' timestamp
+        // Update visualization timestamp
         $certificate->last_view_at = DateTimeImmutable::createFromMutable(new DateTime());
         $certificate->save();
 
-        // Cache the generated certificate
+        // Persist generated file into cache
         StorageCacheHelper::save("certificates/{$editionId}/{$certificate->code}.png", $data);
 
-        // Stream the image as a download response
+        // Stream generated PNG as download
         return Response::streamDownload(function () use ($data) {
             echo $data;
         }, 'certificate_' . $certificate->code . '.png', [
@@ -137,7 +161,12 @@ class CertificatesDownloadController extends Controller
     }
 
     /**
-     * Remove PHP time and memory limits for large image generation.
+     * Remove PHP execution time and memory limits for certificate rendering.
+     *
+     * This is required because certificate generation may involve large PNG files,
+     * custom fonts, text rendering, QR code generation, and image manipulation.
+     *
+     * @return void
      */
     private function removeMemoryAndTimeLimits(): void
     {
@@ -146,32 +175,43 @@ class CertificatesDownloadController extends Controller
     }
 
     /**
-     * Resolve the correct certificate template (PNG) and text color based on the certificate type.
+     * Resolve the certificate template file and main text color for a certificate.
      *
-     * Priority order:
-     * Organizer > Collaborator > Talk (Speaker) > Participant
+     * The template is selected according to the certificate role priority:
+     * Organizer > Collaborator > Talk/Speaker > Participant
      *
-     * @param object $certificate
-     * @param object|null $certificateOptions
-     * @param string $editionId
-     * @return array [file path, hex color]
+     * Each role must exist on the certificate record and also be configured in the
+     * edition certificate options. The template file is retrieved from storage and
+     * cached locally before being returned.
+     *
+     * When no matching template is found, the method returns `null` as file path and
+     * the default certificate text color.
+     *
+     * @param PeopleCertificate $certificate Certificate being rendered.
+     * @param object|null $certificateOptions Edition certificate configuration object.
+     * @param int|string $editionId Edition identifier used to resolve storage paths.
+     *
+     * @return array{0: string|null, 1: string}
      */
-    private function resolveCertificateTemplate(object $certificate, ?object $certificateOptions, string $editionId): array
-    {
+    private function resolveCertificateTemplate(
+        PeopleCertificate $certificate,
+        ?object $certificateOptions,
+        int|string $editionId
+    ): array {
         $defaultColor = '#FE8200';
 
         $types = [
             'organizer' => 'organizer',
             'collaborator' => 'collaborator',
             'talk' => 'speaker',
-            'participant' => 'participant'
+            'participant' => 'participant',
         ];
 
         foreach ($types as $property => $optionKey) {
             if ($certificate->$property && isset($certificateOptions->$optionKey)) {
                 $option = $certificateOptions->$optionKey;
 
-                // Load template file from S3 and cache locally
+                // Load template file from storage and cache locally
                 $fileKey = "editions/{$editionId}/{$option->file}";
                 $file = StorageCacheHelper::get($fileKey);
 
@@ -181,5 +221,4 @@ class CertificatesDownloadController extends Controller
 
         return [null, $defaultColor];
     }
-
 }

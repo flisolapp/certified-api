@@ -10,6 +10,28 @@ use InvalidArgumentException;
 
 class CertificatesSearchController extends Controller
 {
+    /**
+     * Search released certificates by public code or person email.
+     *
+     * This endpoint receives a search term, normalizes and validates it,
+     * and then searches non-removed certificate records using one of the
+     * following criteria:
+     * - Exact certificate public code
+     * - Exact email of the related person
+     *
+     * The response contains a simplified list of matching certificates,
+     * including edition year, optional unit, certificate holder name,
+     * role in the edition, and public certificate code.
+     *
+     * Possible responses:
+     * - 200: One or more certificates were found
+     * - 400: The informed search term is invalid
+     * - 404: No certificates matched the informed term
+     *
+     * @param string $term Search term used to find certificates by code or email.
+     *
+     * @return JsonResponse
+     */
     public function execute(string $term): JsonResponse
     {
         try {
@@ -17,6 +39,7 @@ class CertificatesSearchController extends Controller
             Log::info($term);
         } catch (InvalidArgumentException $e) {
             Log::warning('Invalid term used in search: ' . $e->getMessage());
+
             return response()->json([
                 'error' => $e->getMessage(),
             ], 400);
@@ -50,6 +73,7 @@ class CertificatesSearchController extends Controller
             }
 
             $unit = null;
+
             if (!empty($item->edition->options) && is_object($item->edition->options)) {
                 $unit = $item->edition->options->unit ?? null;
             }
