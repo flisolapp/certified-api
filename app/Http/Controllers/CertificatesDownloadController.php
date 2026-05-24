@@ -97,33 +97,65 @@ class CertificatesDownloadController extends Controller
         // Load the certificate template image
         $image = @imagecreatefrompng($certificateFile);
 
-        // Render participant name
-        if ($name) {
-            [$firstLine, $secondLine] = StringHelper::splitTextBySpace($name, 23);
+        // TODO: Move this config to database
+        if ($editionId <= 21) {
 
-            // Shadow for readability
-            $shadow = imagecolorallocate($image, 240, 240, 240);
-            imagefttext($image, 60, 0, 109, 471, $shadow, $font, $firstLine);
+            // Render participant name
+            if ($name) {
+                [$firstLine, $secondLine] = StringHelper::splitTextBySpace($name, 23);
 
-            if ($secondLine) {
-                imagefttext($image, 60, 0, 109, 551, $shadow, $font, $secondLine);
+                // Shadow for readability
+                $shadow = imagecolorallocate($image, 240, 240, 240);
+                imagefttext($image, 60, 0, 109, 471, $shadow, $font, $firstLine);
+
+                if ($secondLine) {
+                    imagefttext($image, 60, 0, 109, 551, $shadow, $font, $secondLine);
+                }
+
+                // Main name text color
+                $rgb = ColorHelper::hexToRgb($colorHex);
+                $nameColor = imagecolorallocate($image, $rgb->red, $rgb->green, $rgb->blue);
+                imagefttext($image, 60, 0, 108, 470, $nameColor, $font, $firstLine);
+
+                if ($secondLine) {
+                    imagefttext($image, 60, 0, 108, 550, $nameColor, $font, $secondLine);
+                }
             }
 
-            // Main name text color
-            $rgb = ColorHelper::hexToRgb($colorHex);
-            $nameColor = imagecolorallocate($image, $rgb->red, $rgb->green, $rgb->blue);
-            imagefttext($image, 60, 0, 108, 470, $nameColor, $font, $firstLine);
-
-            if ($secondLine) {
-                imagefttext($image, 60, 0, 108, 550, $nameColor, $font, $secondLine);
+            // Render talk title for speaker-related certificates
+            if ($certificate->talk) {
+                $title = $certificate->talk->title;
+                $titleColor = imagecolorallocate($image, 74, 79, 82);
+                imagefttext($image, 18, 0, 114, 620, $titleColor, $font, $title);
             }
-        }
+        } else {
+            if ($name) {
+                [$firstLine, $secondLine] = StringHelper::splitTextBySpace($name, 23);
 
-        // Render talk title for speaker-related certificates
-        if ($certificate->talk) {
-            $title = $certificate->talk->title;
-            $titleColor = imagecolorallocate($image, 74, 79, 82);
-            imagefttext($image, 18, 0, 114, 620, $titleColor, $font, $title);
+                // Shadow for readability
+                $shadow = imagecolorallocate($image, 240, 240, 240);
+                imagefttext($image, 70, 0, 109 + 40, 471 + 18, $shadow, $font, $firstLine);
+
+                if ($secondLine) {
+                    imagefttext($image, 70, 0, 109 + 40, 551 + 18 + 5, $shadow, $font, $secondLine);
+                }
+
+                // Main name text color
+                $rgb = ColorHelper::hexToRgb($colorHex);
+                $nameColor = imagecolorallocate($image, $rgb->red, $rgb->green, $rgb->blue);
+                imagefttext($image, 70, 0, 108 + 40, 470 + 18, $nameColor, $font, $firstLine);
+
+                if ($secondLine) {
+                    imagefttext($image, 70, 0, 108 + 40, 550 + 18 + 5, $nameColor, $font, $secondLine);
+                }
+            }
+
+            // Render talk title for speaker-related certificates
+            if ($certificate->talk) {
+                $title = $certificate->talk->title;
+                $titleColor = imagecolorallocate($image, 74, 79, 82);
+                imagefttext($image, 18, 0, 114 + 40, 620 + 15, $titleColor, $font, $title);
+            }
         }
 
         // Render CPF when available
